@@ -95,10 +95,16 @@
     .moonlive::after {
       content: ""; position: absolute; inset: 0; border-radius: 50%;
       background:
+        /* Limb darkening. Without this the raw texture stays bright right up
+           to the mask, which reads as a hard white line around the edge. */
+        radial-gradient(circle at 50% 50%,
+          rgba(0, 0, 0, 0) 52%, rgba(0, 0, 0, 0.38) 82%,
+          rgba(0, 0, 0, 0.72) 96%, rgba(0, 0, 0, 0.85) 100%),
         radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 46%),
-        radial-gradient(circle at 74% 76%, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0) 60%);
+        radial-gradient(circle at 74% 76%, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0) 74%);
       box-shadow: inset -12px -8px 26px rgba(0, 0, 0, 0.7),
-                  inset 12px 4px 22px rgba(99, 205, 230, 0.20);
+                  inset 12px 4px 22px rgba(99, 205, 230, 0.20),
+                  inset 0 0 0 1px rgba(0, 0, 0, 0.55);
     }
 
     /* ---------- sections ---------- */
@@ -121,20 +127,12 @@
     .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
     .doordesc { color: var(--ink2); line-height: 1.65; padding-left: 21px; max-width: 54ch; }
 
-    .split { display: grid; gap: 3rem; align-items: center; margin-top: 2.5rem; }
-    .cards { display: grid; gap: 1rem; }
+    .cards { display: grid; gap: 1rem; margin-top: 2.5rem; }
     .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 1.375rem 1.5rem; }
     .card h3 { font-size: 1.0625rem; font-weight: 700; display: flex; align-items: center; gap: 0.625rem; }
     .card p { margin-top: 0.5rem; color: var(--ink2); line-height: 1.6; font-size: 0.9375rem; }
     .pip { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 
-    .price { display: grid; gap: 0.75rem; margin: 2rem 0 0; max-width: 34rem; }
-    .prow { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
-            padding: 0.875rem 0; border-bottom: 1px solid var(--line); }
-    .prow span:first-child { color: var(--ink2); }
-    .prow span:last-child { font-family: var(--mono); font-size: 0.9375rem; color: var(--ink2); white-space: nowrap; }
-    .prow.us span { color: var(--sagelight); font-weight: 700; }
-    .prow.us span:last-child { font-weight: 500; }
 
     .privacy { border-radius: 24px; background: var(--bg2); border: 1px solid var(--line);
                padding: 2rem; margin: 4rem 0 0; }
@@ -162,7 +160,7 @@
       .statbig { font-size: 6rem; }
       ul.doors li { grid-template-columns: 300px 1fr; gap: 1.5rem; align-items: baseline; }
       .doordesc { padding-left: 0; }
-      .split { grid-template-columns: 1fr 300px; gap: 4rem; }
+      .cards { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
       .privacy { padding: 3rem; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -204,7 +202,7 @@
 
     <section class="stat">
       <div class="statbig">4.8 hours</div>
-      <p>That is how long the average American teenager spends on social media every day. Not on their phone. On social media alone. Over a year it adds up to seventy three days, awake, gone.</p>
+      <p>That is how long the average American teenager spends on social media every day. Not on their phone. On social media alone. It comes to 1,752 hours a year, and measured against the roughly sixteen hours anyone is actually awake, that is <strong>109 whole days of waking life</strong>, gone.</p>
       <p class="src">Gallup, Familial &amp; Adolescent Health Survey, 2023</p>
     </section>
 
@@ -222,10 +220,6 @@
       <p class="lede">Most apps hand you an escape hatch and call it flexibility: a snooze, an "ignore limit", a setting you can raise in four taps at exactly the moment you should not. Eclipse closes those. When today's budget is spent, your tracked apps close, and there is no button anywhere that says keep going.</p>
       <ul class="doors">
         <li>
-          <div class="doorname"><span class="dot" style="background: var(--sage)"></span>Close it</div>
-          <p class="doordesc">Put the phone down and the day counts as kept. Your streak grows by one. Reaching your limit is a success, not a failure, so the whole app stays green when you land on it.</p>
-        </li>
-        <li>
           <div class="doorname"><span class="dot" style="background: var(--honey)"></span>Two minutes, right now</div>
           <p class="doordesc">For the message that genuinely cannot wait. Two minutes, granted the instant you tap, in the app you tapped from. Three a day and then a cooldown. Your streak survives all three.</p>
         </li>
@@ -234,7 +228,8 @@
           <p class="doordesc">The real emergency door. Ask your circle for fifteen minutes, an hour, or the rest of the day, and say why. The first yes opens it. You do not have to raise your limit, and you do not have to delete Eclipse to get your evening back. A day a friend helped is its own calm blue on your calendar: never a broken streak, and never a day you can pretend you earned.</p>
         </li>
       </ul>
-      <p class="kicker">Raising your limit is always possible, because this is your phone and we are not going to pretend otherwise. It just costs your streak, and Eclipse says so before you confirm. Tightening is free. Loosening is not.</p>
+      <p class="kicker">Raising your limit is always possible, because this is your phone. It just costs your streak, and Eclipse says so before you confirm. Tightening is free. Loosening is not.</p>
+      <p class="kicker">Two things make that a real decision rather than a reflex. <strong>Your friends can see your limit</strong>, so a number you quietly doubled is a number they will notice. And <strong>a new limit never applies today.</strong> It waits for the next 6am, which means it cannot rescue the evening you are currently losing. Today keeps the promise you made yesterday, and there is nothing you can do at 11pm to change that.</p>
     </section>
 
     <section>
@@ -247,26 +242,18 @@
     <section>
       <p class="mono">Phone down</p>
       <h2>The good kind of competition.</h2>
-      <div class="split">
-        <div class="cards">
-          <div class="card">
-            <h3><span class="pip" style="background: var(--sage)"></span>Put the phone down on purpose</h3>
-            <p>Start a session and the whole phone closes, not just the apps you track. Invite whoever is already down and you finish together.</p>
-          </div>
-          <div class="card">
-            <h3><span class="pip" style="background: var(--dusk)"></span>A board that counts the right thing</h3>
-            <p>It ranks the minutes you chose to be unreachable, never the hours you lost. Nobody wins by having a worse week.</p>
-          </div>
-          <div class="card">
-            <h3><span class="pip" style="background: var(--honey)"></span>Something to show for it</h3>
-            <p>Finishing pays fuel, and friends still down at the end pay you a bonus. Fuel buys 3D bodies for your home screen, asteroids up to galaxies. It buys nothing else. Neither fuel nor money can ever buy time through your limit.</p>
-          </div>
+      <div class="cards">
+        <div class="card">
+          <h3><span class="pip" style="background: var(--sage)"></span>Put the phone down on purpose</h3>
+          <p>Start a session and the whole phone closes, not just the apps you track. Eclipse itself stays completely silent while it runs: no countdown pings, no progress nudges, nothing engineered to pull you back to the screen you just put down.</p>
         </div>
-        <div class="phone">
-          <div class="screen">
-            <img src="eclipse-down.png" width="644" height="1400" loading="lazy"
-                 alt="Eclipse's phone down screen: this week's ranking of friends by phone down minutes, and a Start a session button">
-          </div>
+        <div class="card">
+          <h3><span class="pip" style="background: var(--dusk)"></span>A board that counts the right thing</h3>
+          <p>It ranks the minutes you chose to be unreachable, never the hours you lost. Nobody wins by having a worse week.</p>
+        </div>
+        <div class="card">
+          <h3><span class="pip" style="background: var(--honey)"></span>Something to show for it</h3>
+          <p>Finishing pays fuel, and fuel buys 3D bodies for your home screen, asteroids up to galaxies. They are not decoration for its own sake. The body you are carrying is bought with hours you actually spent away from your phone, so the tier you have reached is a record of how much time you have taken back. Progress that is otherwise invisible, sitting on your home screen where you can see it.</p>
         </div>
       </div>
     </section>
@@ -275,14 +262,8 @@
       <p class="mono">The price</p>
       <h2>All of it, free.</h2>
       <p class="lede">Screen time apps have quietly become expensive. The popular ones run between thirty and a hundred dollars a year, and one of them asks $399 for a lifetime licence. Their free tiers are usually built to be just annoying enough that you pay.</p>
-      <div class="price">
-        <div class="prow"><span>A well known focus app</span><span>$99.99 / year</span></div>
-        <div class="prow"><span>Another, with a lifetime option</span><span>$44.99 / year</span></div>
-        <div class="prow"><span>A third, the cheap one</span><span>$29.99 / year</span></div>
-        <div class="prow us"><span>Eclipse, everything on this page</span><span>$0</span></div>
-      </div>
       <p class="kicker">There is no paid tier, no locked feature and no trial that expires. The limit, the friend circle, the emergency door, the sessions, all of it is simply the app.</p>
-      <p class="kicker">The reason is not generosity, it is arithmetic. The people this problem hurts most are the ones least able to pay to fix it. A fifteen year old losing five hours a day is not going to talk a parent into a hundred dollar subscription for an app whose entire promise is to make their phone less fun. Charging them would mean building something that only reaches the people who need it least.</p>
+      <p class="kicker">The reason is not generosity, it is arithmetic. The people this problem hurts most are the ones least able to pay to fix it. A fifteen year old losing five hours a day is not going to talk a parent into a hundred dollar subscription. Charging would mean building something that doesn't reach the people who are most vulnerable.</p>
     </section>
 
     <div class="privacy">
