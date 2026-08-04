@@ -28,7 +28,6 @@
       --frost: #63CDE6; --honey: #F2B75C; --dusk: #7FB0E8; --sunset: #FF8A5C;
       --sans: "Nunito Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
       --mono: "DM Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-      --ease: cubic-bezier(0.22, 0.68, 0.24, 1);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { color-scheme: dark; scroll-behavior: smooth; }
@@ -40,80 +39,56 @@
     ::selection { background: rgba(73, 215, 162, 0.28); }
     a { color: var(--sage); }
 
-    /* ---------- atmosphere ---------- */
-    /* Drawn once and parallaxed with a transform. Repainting a few hundred
-       stars every frame is a real cost for pure ambience. */
-    #stars {
-      position: fixed; left: 0; top: -200px; width: 100%;
-      height: calc(100vh + 400px);
-      pointer-events: none; z-index: 0; will-change: transform;
-    }
-    .grain {
-      position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.035;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
-    }
+    .wrap { max-width: 66rem; margin: 0 auto; padding: 0 1.5rem; position: relative; z-index: 1; }
     .corona {
-      position: absolute; top: -22rem; left: 50%; transform: translateX(-50%);
-      width: 68rem; height: 68rem; pointer-events: none; z-index: 0;
-      background: radial-gradient(circle, rgba(99, 205, 230, 0.15) 0%, rgba(127, 176, 232, 0.06) 34%, rgba(6, 8, 14, 0) 62%);
+      position: absolute; top: -20rem; left: 50%; transform: translateX(-50%);
+      width: 64rem; height: 64rem; pointer-events: none; z-index: 0;
+      background: radial-gradient(circle, rgba(99, 205, 230, 0.17) 0%, rgba(127, 176, 232, 0.07) 34%, rgba(6, 8, 14, 0) 62%);
     }
 
-    .wrap { max-width: 66rem; margin: 0 auto; padding: 0 1.5rem; position: relative; z-index: 2; }
     .mono { font-family: var(--mono); font-weight: 500; text-transform: uppercase;
             letter-spacing: 0.14em; font-size: 0.6875rem; color: var(--ink3); }
 
-    header { display: block; }
-    .headerbar { display: flex; align-items: center; justify-content: space-between;
-                 padding-top: 1.5rem; padding-bottom: 1.5rem; }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 0; }
     .brand { display: flex; align-items: center; gap: 0.75rem; }
     .brand span { font-size: 1.375rem; font-weight: 700; font-variation-settings: "wdth" 125; letter-spacing: -0.01em; }
     .appicon { border-radius: 22.5%; display: block; }
 
-    /* ---------- the stage ---------- */
-    .stage { position: relative; z-index: 2; }
-    .stagefix { position: relative; }
-    /* Inside the stage the wrap must not open a stacking context, or the
-       headline could never sit above the moon while the moon still has to
-       sit above the phone at the end of the flight. */
-    .stagefix .wrap { z-index: auto; }
-    .herotext { position: relative; z-index: 4; }
-    .stagefix > header { position: relative; z-index: 5; }
+    /* ---------- hero ---------- */
     .hero { display: grid; gap: 3rem; align-items: center; padding: 2.5rem 0 1rem; }
     h1 { font-size: 2.5rem; line-height: 1.05; letter-spacing: -0.03em; font-weight: 800;
          font-variation-settings: "wdth" 125; }
     h1 .glow { color: var(--sagelight); text-shadow: 0 0 34px rgba(73, 215, 162, 0.45); }
-    .h1wrap { transform-origin: 50% 50%; will-change: transform; }
     .hero p.sub { margin-top: 1.5rem; max-width: 46ch; font-size: 1.125rem; line-height: 1.6; color: var(--ink2); }
     .cta { margin-top: 2.25rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.25rem; }
     .button {
-      position: relative; display: inline-block;
-      background: linear-gradient(180deg, var(--sagelight), var(--sage));
+      display: inline-block; background: linear-gradient(180deg, var(--sagelight), var(--sage));
       color: #04120C; font-weight: 700; font-size: 1rem;
       padding: 0.9375rem 1.75rem; border-radius: 999px; text-decoration: none;
       box-shadow: 0 0 44px -6px rgba(73, 215, 162, 0.55);
-      transition: transform 0.2s var(--ease), box-shadow 0.3s var(--ease);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
-    .button::after {
-      content: ""; position: absolute; inset: -6px; border-radius: 999px;
-      border: 1px solid rgba(123, 235, 196, 0.35); opacity: 0;
-      transition: opacity 0.3s var(--ease), inset 0.3s var(--ease);
-    }
-    .button:hover { transform: translateY(-2px); box-shadow: 0 0 64px -2px rgba(73, 215, 162, 0.75); }
-    .button:hover::after { opacity: 1; inset: -10px; }
+    .button:hover { transform: translateY(-1px); box-shadow: 0 0 56px -4px rgba(73, 215, 162, 0.7); }
     .ctanote { color: var(--ink3); font-size: 0.875rem; line-height: 1.5; }
 
     .phone { width: 258px; margin: 0 auto; border-radius: 2.75rem; background: #000;
-             padding: 8px; border: 1px solid var(--line); position: relative; z-index: 2;
+             padding: 8px; border: 1px solid var(--line);
              box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.9), 0 0 80px -20px rgba(99, 205, 230, 0.22); }
     .screen { position: relative; border-radius: 2.3rem; overflow: hidden; }
     .screen img { width: 100%; height: auto; display: block; }
 
-    /* The moon lives outside the phone so it can fly clear of it. Everything
-       about where it sits, in flight and at rest, is set from script. */
+    /* The moon on the phone is a real sphere, ray traced per pixel in WebGL
+       against the lunar albedo map taken out of the app's own 3D model. The
+       silhouette and the terminator come from the geometry, so there is no
+       painted edge to go white or black. Falls back to a still render. */
     .moonlive {
-      position: absolute; left: 0; top: 0; z-index: 3; opacity: 0;
-      pointer-events: none; will-change: transform;
+      position: absolute; left: 50.54%; top: 24.9%; width: 36%; aspect-ratio: 1;
+      transform: translate(-50%, -50%);
     }
+    /* The glow is its own element behind the canvas on purpose. A CSS filter
+       on an ancestor makes the browser rasterize the whole subtree into a
+       texture, frequently at 1x rather than the device pixel ratio, which
+       quietly turns a sharp canvas into a blurry one. */
     .moonglow {
       position: absolute; inset: -42%; border-radius: 50%; pointer-events: none;
       background: radial-gradient(circle,
@@ -123,37 +98,17 @@
     .moonlive canvas, .moonlive img {
       position: relative; width: 100%; height: 100%; display: block;
     }
-    /* The opening moon fills the screen behind the headline. This dims it so
-       white type stays readable, then lifts as the moon pulls away. */
-    .moonveil {
-      position: absolute; inset: 0; border-radius: 50%; z-index: 2;
-      background: radial-gradient(circle, rgba(6, 8, 14, 0.72) 0%,
-                                          rgba(6, 8, 14, 0.62) 62%,
-                                          rgba(6, 8, 14, 0.40) 100%);
-    }
 
     /* ---------- sections ---------- */
-    section { position: relative; padding: 4rem 0; }
-    section + section::before, .privacy::before, .closer::before {
-      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg,
-        rgba(142, 172, 216, 0) 0%, rgba(142, 172, 216, 0.22) 22%,
-        rgba(142, 172, 216, 0.22) 78%, rgba(142, 172, 216, 0) 100%);
-    }
+    section { border-top: 1px solid var(--line); padding: 4rem 0; }
     h2 { font-size: 1.875rem; letter-spacing: -0.025em; font-weight: 800; font-variation-settings: "wdth" 118;
          line-height: 1.12; }
     .lede { margin-top: 1rem; max-width: 58ch; color: var(--ink2); line-height: 1.65; }
     .kicker { margin-top: 1.5rem; max-width: 58ch; line-height: 1.65; color: var(--ink); }
-    section > .mono { display: block; margin-bottom: 0.75rem; }
 
-    .stat { text-align: center; padding: 5.5rem 0; }
-    .statbig {
-      font-size: 4rem; line-height: 1; font-weight: 800; font-variation-settings: "wdth" 125;
-      letter-spacing: -0.04em;
-      background: linear-gradient(180deg, #FFB68F 0%, var(--sunset) 62%, #D8542F 100%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      filter: drop-shadow(0 0 38px rgba(255, 138, 92, 0.32));
-    }
+    .stat { text-align: center; padding: 4.5rem 0; }
+    .statbig { font-size: 4rem; line-height: 1; font-weight: 800; font-variation-settings: "wdth" 125;
+               letter-spacing: -0.04em; color: var(--sunset); }
     .stat p { margin: 1.25rem auto 0; max-width: 46ch; color: var(--ink2); line-height: 1.65; }
     .stat .src { margin-top: 1.25rem; font-size: 0.8125rem; color: var(--ink3); }
 
@@ -165,47 +120,28 @@
     .doordesc { color: var(--ink2); line-height: 1.65; padding-left: 21px; max-width: 54ch; }
 
     .cards { display: grid; gap: 1rem; margin-top: 2.5rem; }
-    .card {
-      position: relative; background: var(--card); border: 1px solid var(--line);
-      border-radius: 20px; padding: 1.5rem 1.5rem 1.625rem; overflow: hidden;
-      transition: transform 0.35s var(--ease), border-color 0.35s var(--ease);
-    }
-    .card::before {
-      content: ""; position: absolute; inset: 0; border-radius: 20px; opacity: 0;
-      background: radial-gradient(120% 90% at 50% 0%, rgba(99, 205, 230, 0.12), rgba(99, 205, 230, 0) 60%);
-      transition: opacity 0.35s var(--ease);
-    }
-    .card:hover { transform: translateY(-4px); border-color: rgba(142, 172, 216, 0.32); }
-    .card:hover::before { opacity: 1; }
-    .card h3 { position: relative; font-size: 1.0625rem; font-weight: 700; display: flex; align-items: center; gap: 0.625rem; }
-    .card p { position: relative; margin-top: 0.5rem; color: var(--ink2); line-height: 1.6; font-size: 0.9375rem; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 1.375rem 1.5rem; }
+    .card h3 { font-size: 1.0625rem; font-weight: 700; display: flex; align-items: center; gap: 0.625rem; }
+    .card p { margin-top: 0.5rem; color: var(--ink2); line-height: 1.6; font-size: 0.9375rem; }
     .pip { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 
-    .privacy {
-      position: relative; border-radius: 24px; background: var(--bg2);
-      border: 1px solid var(--line); padding: 2rem; margin: 4rem 0 0; z-index: 2;
-      box-shadow: 0 0 90px -40px rgba(73, 215, 162, 0.5);
-    }
-    .privacy::before { display: none; }
+
+    .privacy { border-radius: 24px; background: var(--bg2); border: 1px solid var(--line);
+               padding: 2rem; margin: 4rem 0 0; }
     .privacy h2 { color: var(--sagelight); }
     .privacy p { margin-top: 1.125rem; max-width: 62ch; line-height: 1.65; color: var(--ink2); }
     .privacy strong { color: var(--ink); font-weight: 600; }
 
-    .closer { position: relative; text-align: center; padding: 5.5rem 0 1rem; }
+    .closer { text-align: center; padding: 5rem 0 1rem; border-top: 1px solid var(--line); }
     .closer h2 { max-width: 20ch; margin: 0 auto; }
     .closer .cta { justify-content: center; margin-top: 2rem; flex-direction: column; gap: 0.875rem; }
 
     footer { border-top: 1px solid var(--line); padding: 2.5rem 0 3rem; margin-top: 4rem;
              display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
-             gap: 1.5rem; font-size: 0.875rem; color: var(--ink3); position: relative; z-index: 2; }
+             gap: 1.5rem; font-size: 0.875rem; color: var(--ink3); }
     footer .brand span { font-size: 1.0625rem; color: var(--ink); }
     footer .right { text-align: right; }
     footer .right p + p { margin-top: 0.3125rem; }
-
-    /* ---------- reveals ---------- */
-    .rv { opacity: 0; transform: translateY(20px); }
-    .rv-on { opacity: 1; transform: none;
-             transition: opacity 0.75s var(--ease), transform 0.75s var(--ease); }
 
     @media (min-width: 820px) {
       .hero { grid-template-columns: 1.08fr 1fr; padding: 4rem 0 2rem; }
@@ -219,95 +155,44 @@
       .cards { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
       .privacy { padding: 3rem; }
     }
-
-    /* The pinned flight only runs where there is room for it. Script owns that
-       decision and sets .cine, so the styles below key off the class alone and
-       CSS can never disagree with the maths driving the flight. */
-    body.cine .stage { height: 220vh; }
-    body.cine .stagefix {
-      position: sticky; top: 0; height: 100vh;
-      display: flex; flex-direction: column; justify-content: center;
-      overflow: hidden;
-    }
-    body.cine .stagefix > header { position: absolute; top: 0; left: 0; right: 0; }
-    body.cine .hero { padding: 0; }
-    body.cine .hero .sub, body.cine .hero .cta { will-change: opacity, transform; }
-    body.cine .phone { will-change: opacity, transform; }
-    body.cine .scrollcue {
-      position: absolute; left: 50%; bottom: 2.25rem; transform: translateX(-50%);
-      width: 22px; height: 34px; border: 1px solid rgba(231, 236, 245, 0.28);
-      border-radius: 999px; pointer-events: none;
-    }
-    body.cine .scrollcue::after {
-      content: ""; position: absolute; left: 50%; top: 7px; width: 3px; height: 7px;
-      margin-left: -1.5px; border-radius: 2px; background: rgba(231, 236, 245, 0.6);
-      animation: cue 1.9s var(--ease) infinite;
-    }
-    @keyframes cue {
-      0% { transform: translateY(0); opacity: 0; }
-      30% { opacity: 1; }
-      70% { transform: translateY(11px); opacity: 0; }
-      100% { transform: translateY(11px); opacity: 0; }
-    }
-    
-
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      .button, .card { transition: none; }
-      .rv { opacity: 1; transform: none; }
-      body.cine .scrollcue { display: none; }
+      .button { transition: none; }
+      .moonskin { animation: none; }
     }
   </style>
 </head>
 <body>
-  <canvas id="stars" aria-hidden="true"></canvas>
-  <div class="grain" aria-hidden="true"></div>
   <div class="corona" aria-hidden="true"></div>
-
-  <section class="stage" id="stage">
-    <div class="stagefix" id="stagefix">
-
-      <header>
-        <div class="wrap headerbar">
-          <div class="brand">
-            <img class="appicon" src="eclipse-icon.png" alt="" width="30" height="30">
-            <span>Eclipse</span>
-          </div>
-          <span class="mono">Free &middot; For iPhone</span>
-        </div>
-      </header>
-
-      <div class="wrap">
-        <div class="hero">
-          <div class="herotext">
-            <div class="h1wrap" id="h1wrap">
-              <h1>The way past your limit is not a button. It is a <span class="glow">person</span>.</h1>
-            </div>
-            <p class="sub">Eclipse puts a hard daily limit on the apps that eat your day. When it runs out, it runs out. There is no "15 more minutes", no talking yourself into it at 1am. If you genuinely need more time, you ask a friend, and they decide.</p>
-            <div class="cta">
-              <a class="button" href="https://testflight.apple.com/join/ADW7nST8">Get Eclipse free</a>
-              <p class="ctanote">Free, iPhone, iOS 26 or newer.<br>No subscription and no trial.</p>
-            </div>
-          </div>
-          <div class="phone" id="phone">
-            <div class="screen" id="screen">
-              <img src="eclipse-home-v2.png" width="644" height="1400" loading="eager"
-                   alt="Eclipse's home screen in dark mode: the Moon floating above an 8 day streak, about 53 minutes of screen time today, 8 minutes of a one hour limit used, time down today and pickups today, and this week's bars">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="moonlive" id="moonlive" aria-hidden="true">
-        <div class="moonglow"></div><canvas id="moon3d"></canvas>
-        <div class="moonveil" id="moonveil"></div>
-      </div>
-      <div class="scrollcue" id="scrollcue" aria-hidden="true"></div>
-
-    </div>
-  </section>
-
   <div class="wrap">
+
+    <header>
+      <div class="brand">
+        <img class="appicon" src="eclipse-icon.png" alt="" width="30" height="30">
+        <span>Eclipse</span>
+      </div>
+      <span class="mono">Free · For iPhone</span>
+    </header>
+
+    <section class="hero" style="border-top: none">
+      <div>
+        <h1>The way past your limit is not a button. It is a <span class="glow">person</span>.</h1>
+        <p class="sub">Eclipse puts a hard daily limit on the apps that eat your day. When it runs out, it runs out. There is no "15 more minutes", no talking yourself into it at 1am. If you genuinely need more time, you ask a friend, and they decide.</p>
+        <div class="cta">
+          <a class="button" href="https://testflight.apple.com/join/ADW7nST8">Get Eclipse free</a>
+          <p class="ctanote">Free, iPhone, iOS 26 or newer.<br>No subscription and no trial.</p>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <img src="eclipse-home-v2.png" width="644" height="1400" loading="eager"
+               alt="Eclipse's home screen in dark mode: the Moon floating above an 8 day streak, about 53 minutes of screen time today, 8 minutes of a one hour limit used, time down today and pickups today, and this week's bars">
+          <div class="moonlive" aria-hidden="true">
+            <div class="moonglow"></div><canvas id="moon3d"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="stat">
       <div class="statbig">4.8 hours</div>
@@ -404,374 +289,157 @@
   </div>
 
   <script>
+  /* A rotating moon, ray traced against a sphere one pixel at a time.
+     Texture: the base colour map lifted out of the app's own glTF body, so
+     this is the same moon the phone renders. If WebGL is missing or the
+     texture will not load, a still render of the identical shading takes
+     its place, and reduced-motion viewers get one frame instead of a loop. */
   (function () {
-    var reduce = window.matchMedia
-      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    /* ==================================================================
-       The moon: a sphere ray traced per pixel against the albedo map
-       taken out of the app's own glTF body.
-       ================================================================== */
     var cv = document.getElementById('moon3d');
-    var moonEl = document.getElementById('moonlive');
-    var ready = false, drawMoon = null;
+    if (!cv) return;
 
-    (function initMoon() {
-      function fallback() {
-        var im = new Image();
-        im.src = 'moon-still.png'; im.alt = '';
-        if (cv && cv.parentNode) cv.parentNode.replaceChild(im, cv);
-        ready = true;
-        drawMoon = function () {};
-      }
-      if (!cv) return;
-
-      var gl;
-      try {
-        gl = cv.getContext('webgl', { alpha: true, antialias: false, depth: false })
-          || cv.getContext('experimental-webgl', { alpha: true, antialias: false, depth: false });
-      } catch (e) { gl = null; }
-      if (!gl) { fallback(); return; }
-
-      var VERT = 'attribute vec2 aPos;varying vec2 vUv;' +
-                 'void main(){vUv=aPos;gl_Position=vec4(aPos,0.0,1.0);}';
-      var FRAG =
-        'precision highp float;varying vec2 vUv;uniform sampler2D uTex;' +
-        'uniform float uRot;uniform float uPx;' +
-        'void main(){' +
-        '  vec2 p=vUv;float r2=dot(p,p);' +
-        '  float a=1.0-smoothstep(1.0-uPx,1.0+uPx,r2);' +
-        '  if(a<=0.0){discard;}' +
-        '  float z=sqrt(max(0.0,1.0-min(r2,1.0)));' +
-        '  vec3 n=vec3(p,z);' +
-        '  float c=cos(uRot),s=sin(uRot);' +
-        '  vec3 nr=vec3(n.x*c-n.z*s,n.y,n.x*s+n.z*c);' +
-        '  float lon=atan(nr.x,nr.z);float lat=asin(clamp(nr.y,-1.0,1.0));' +
-        '  vec2 uv=vec2(lon*0.15915494+0.5,0.5-lat*0.31830989);' +
-        '  vec3 alb=texture2D(uTex,uv).rgb;' +
-        '  vec3 L=normalize(vec3(-0.34,0.42,0.84));' +
-        '  float diff=max(dot(n,L),0.0);' +
-        '  vec3 col=alb*(0.13+0.95*diff);' +
-        '  float rim=pow(clamp(1.0-n.z,0.0,1.0),3.0);' +
-        '  float left=pow(clamp(-n.x*0.5+0.5,0.0,1.0),1.5);' +
-        '  col+=rim*left*0.85*vec3(0.36,0.62,0.92);' +
-        '  gl_FragColor=vec4(col*a,a);' +
-        '}';
-
-      function compile(t, src) {
-        var sh = gl.createShader(t);
-        gl.shaderSource(sh, src); gl.compileShader(sh);
-        return gl.getShaderParameter(sh, gl.COMPILE_STATUS) ? sh : null;
-      }
-      var vs = compile(gl.VERTEX_SHADER, VERT), fs = compile(gl.FRAGMENT_SHADER, FRAG);
-      if (!vs || !fs) { fallback(); return; }
-      var prog = gl.createProgram();
-      gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
-      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { fallback(); return; }
-      gl.useProgram(prog);
-
-      var buf = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
-      var loc = gl.getAttribLocation(prog, 'aPos');
-      gl.enableVertexAttribArray(loc);
-      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-
-      var uRot = gl.getUniformLocation(prog, 'uRot');
-      var uPx  = gl.getUniformLocation(prog, 'uPx');
-
-      var tex = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, tex);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE,
-                    new Uint8Array([120, 120, 120]));
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-      gl.clearColor(0, 0, 0, 0);
-      gl.enable(gl.BLEND);
-      gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-
-      var size = 0;
-      drawMoon = function (rot) {
-        /* Twice the device resolution, box filtered down by the browser. The
-           sphere squeezes half the map across its width, so at 1:1 the
-           equator is minified and plain LINEAR sampling crawls. */
-        var dpr = Math.min(window.devicePixelRatio || 1, 3);
-        var css = cv.clientWidth || 100;
-        /* Supersampling earns its keep only while the sphere is small and the
-           texture is minified. A large moon is already magnified, so drop it
-           and cap the buffer, or the opening frame costs millions of pixels
-           of a fairly expensive shader. Quantised so a continuously changing
-           size does not reallocate the buffer on every single frame. */
-        var ss = css > 260 ? 1.25 : 2;
-        var want = Math.round(css * dpr * ss / 64) * 64;
-        want = Math.min(800, Math.max(128, want));
-        if (want !== size) {
-          size = want; cv.width = size; cv.height = size;
-          gl.viewport(0, 0, size, size);
-          gl.uniform1f(uPx, 2.2 / size);
-        }
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.uniform1f(uRot, rot);
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
-      };
-
+    function fallback() {
       var img = new Image();
-      img.onload = function () {
-        gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
-        /* WebGL 1 only allows REPEAT on power-of-two textures and renders the
-           sphere solid black otherwise. Clamp is the safe degradation. */
-        var pot = function (n) { return n > 0 && (n & (n - 1)) === 0; };
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S,
-          pot(img.width) && pot(img.height) ? gl.REPEAT : gl.CLAMP_TO_EDGE);
-        ready = true;
-      };
-      img.onerror = fallback;
-      img.src = 'moon-color.jpg';
-    })();
-
-    /* ==================================================================
-       The flight. One pinned screen: the moon starts huge and centred with
-       the headline low beneath it, then travels straight into the spot it
-       occupies on the home screen as the headline rises into its column.
-       ================================================================== */
-    var stage    = document.getElementById('stage');
-    var stagefix = document.getElementById('stagefix');
-    var phone    = document.getElementById('phone');
-    var screenEl = document.getElementById('screen');
-    var h1wrap   = document.getElementById('h1wrap');
-    var subEl    = document.querySelector('.hero .sub');
-    var ctaEl    = document.querySelector('.hero .cta');
-    var cue      = document.getElementById('scrollcue');
-    var veil     = document.getElementById('moonveil');
-
-    /* Read these live rather than caching them at load. A browser can report
-       reduced-motion before it has settled, and the viewport can cross the
-       size threshold at any time. */
-    var mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-    /* Measured off the document element rather than innerWidth/innerHeight,
-       which some embedders report as zero for the first frames. */
-    function hasRoom() {
-      var d = document.documentElement;
-      return d.clientWidth >= 900 && d.clientHeight >= 620;
-    }
-    var cine = false;
-    function computeMode() {
-      var next = !mqReduce.matches && hasRoom();
-      if (next === cine) return;
-      cine = next;
-      document.body.classList.toggle('cine', cine);
-      if (!cine) {
-        h1wrap.style.transform = '';
-        phone.style.opacity = ''; phone.style.transform = '';
-        subEl.style.opacity = ''; subEl.style.transform = '';
-        ctaEl.style.opacity = ''; ctaEl.style.transform = '';
-      }
-      natural = null;
-    }
-    function onModeChange() { needLayout = true; computeMode(); measure(); layout(); }
-    if (mqReduce.addEventListener) mqReduce.addEventListener('change', onModeChange);
-    else if (mqReduce.addListener) mqReduce.addListener(onModeChange);
-
-    function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
-    function lerp(a, b, t) { return a + (b - a) * t; }
-    function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2; }
-
-    /* Where the moon comes to rest: the exact spot it holds on the home
-       screen, measured off the screenshot rather than guessed. */
-    function restingPlace() {
-      var s = screenEl.getBoundingClientRect();
-      return { cx: s.left + s.width * 0.5054,
-               cy: s.top  + s.height * 0.249,
-               S:  s.width * 0.36 };
+      img.src = 'moon-still.png';
+      img.alt = '';
+      if (cv.parentNode) cv.parentNode.replaceChild(img, cv);
     }
 
-    /* One straight, eased move from the opening position into the phone.
-       No orbit, so the moon never needs to change depth and the whole flight
-       is two points and an easing curve. */
-    function pathAt(t) {
-      var vw = window.innerWidth, vh = window.innerHeight, m = Math.min(vw, vh);
-      var rest = restingPlace();
-      var k = ease(clamp((t - 0.18) / 0.82, 0, 1));
-      return { cx: lerp(vw * 0.50, rest.cx, k),
-               cy: lerp(vh * 0.37, rest.cy, k),
-               S:  lerp(m * 0.72,  rest.S,  k) };
+    var gl;
+    try {
+      gl = cv.getContext('webgl', { alpha: true, antialias: false, depth: false })
+        || cv.getContext('experimental-webgl', { alpha: true, antialias: false, depth: false });
+    } catch (e) { gl = null; }
+    if (!gl) { fallback(); return; }
+
+    var VERT =
+      'attribute vec2 aPos;varying vec2 vUv;' +
+      'void main(){vUv=aPos;gl_Position=vec4(aPos,0.0,1.0);}';
+
+    var FRAG =
+      'precision highp float;varying vec2 vUv;uniform sampler2D uTex;' +
+      'uniform float uRot;uniform float uPx;' +
+      'void main(){' +
+      '  vec2 p=vUv;float r2=dot(p,p);' +
+      /* alpha from the analytic circle, smoothed over one pixel */
+      '  float a=1.0-smoothstep(1.0-uPx,1.0+uPx,r2);' +
+      '  if(a<=0.0){discard;}' +
+      '  float z=sqrt(max(0.0,1.0-min(r2,1.0)));' +
+      '  vec3 n=vec3(p,z);' +
+      /* spin about the vertical axis, then read the equirectangular map */
+      '  float c=cos(uRot),s=sin(uRot);' +
+      '  vec3 nr=vec3(n.x*c-n.z*s,n.y,n.x*s+n.z*c);' +
+      '  float lon=atan(nr.x,nr.z);float lat=asin(clamp(nr.y,-1.0,1.0));' +
+      '  vec2 uv=vec2(lon*0.15915494+0.5,0.5-lat*0.31830989);' +
+      '  vec3 alb=texture2D(uTex,uv).rgb;' +
+      '  vec3 L=normalize(vec3(-0.34,0.42,0.84));' +
+      '  float diff=max(dot(n,L),0.0);' +
+      '  vec3 col=alb*(0.13+0.95*diff);' +
+      /* the cool edge light the app puts on the left of the body */
+      '  float rim=pow(clamp(1.0-n.z,0.0,1.0),3.0);' +
+      '  float left=pow(clamp(-n.x*0.5+0.5,0.0,1.0),1.5);' +
+      '  col+=rim*left*0.85*vec3(0.36,0.62,0.92);' +
+      '  gl_FragColor=vec4(col*a,a);' +
+      '}';
+
+    function compile(type, src) {
+      var sh = gl.createShader(type);
+      gl.shaderSource(sh, src); gl.compileShader(sh);
+      return gl.getShaderParameter(sh, gl.COMPILE_STATUS) ? sh : null;
+    }
+    var vs = compile(gl.VERTEX_SHADER, VERT), fs = compile(gl.FRAGMENT_SHADER, FRAG);
+    if (!vs || !fs) { fallback(); return; }
+    var prog = gl.createProgram();
+    gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { fallback(); return; }
+    gl.useProgram(prog);
+
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+    var loc = gl.getAttribLocation(prog, 'aPos');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    var uRot = gl.getUniformLocation(prog, 'uRot');
+    var uPx  = gl.getUniformLocation(prog, 'uPx');
+
+    var tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    /* one grey texel so the first frames are never a flash of nothing */
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE,
+                  new Uint8Array([120, 120, 120]));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+    var size = 0;
+    function resize() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 3);
+      /* Render at 2x the device resolution and let the browser box-filter it
+         down. The sphere squeezes half the texture into its width, so at 1:1
+         the equator is minified and sampling it with plain LINEAR crawls. */
+      var css = cv.clientWidth || 100;
+      var want = Math.min(1024, Math.max(96, Math.round(css * dpr * 2)));
+      if (want === size) return;
+      size = want; cv.width = size; cv.height = size;
+      gl.viewport(0, 0, size, size);
+      gl.uniform1f(uPx, 2.2 / size);
     }
 
-    var natural = null;
-    function measure() {
-      if (!cine) { natural = null; return; }
-      h1wrap.style.transform = 'none';
-      var r = h1wrap.getBoundingClientRect();
-      natural = { cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
+    gl.clearColor(0, 0, 0, 0);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+    var lastRot = 0;
+    function draw(rot) {
+      lastRot = rot;
+      resize();
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform1f(uRot, rot);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
 
-    function place(cx, cy, S) {
-      var f = stagefix.getBoundingClientRect();
-      moonEl.style.width = S + 'px';
-      moonEl.style.height = S + 'px';
-      moonEl.style.transform =
-        'translate(' + (cx - f.left - S / 2) + 'px,' + (cy - f.top - S / 2) + 'px)';
-      moonEl.style.opacity = '1';
+    /* Resizing the canvas blanks its buffer, and the animation loop is the
+       only thing that would normally repaint it. A tab that is not visible
+       gets no rAF callbacks, so without this a resize while hidden leaves an
+       empty circle behind. Repaint on the spot instead of waiting. */
+    function repaint() { if (ready) draw(lastRot); }
+    if (window.ResizeObserver) new ResizeObserver(repaint).observe(cv);
+    window.addEventListener('resize', repaint);
+    document.addEventListener('visibilitychange', repaint);
+
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var PERIOD = 44000, t0 = null, ready = false;
+
+    var img = new Image();
+    img.onload = function () {
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+      /* REPEAT is what wraps the 0/360 seam on an equirectangular map, but
+         WebGL 1 only allows it on power-of-two textures and renders the
+         sphere solid black otherwise. Keep the map power-of-two; if it ever
+         is not, clamp instead so the worst case is a hairline seam. */
+      var pot = function (n) { return n > 0 && (n & (n - 1)) === 0; };
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S,
+        pot(img.width) && pot(img.height) ? gl.REPEAT : gl.CLAMP_TO_EDGE);
+      ready = true;
+      /* Paint immediately rather than waiting for the animation loop. A tab
+         that loads in the background gets no rAF callbacks at all, and would
+         otherwise sit on an unsized, empty canvas until it was looked at. */
+      draw(still ? 0.6 : 0.0);
+    };
+    img.onerror = fallback;
+    img.src = 'moon-color.jpg';
+
+    if (!still) {
+      (function frame(ts) {
+        if (t0 === null) t0 = ts;
+        if (ready) draw(((ts - t0) % PERIOD) / PERIOD * 6.2831853);
+        requestAnimationFrame(frame);
+      })(0);
     }
-
-    function progress() {
-      if (!cine) return 1;
-      var r = stage.getBoundingClientRect();
-      var span = stage.offsetHeight - window.innerHeight;
-      return span <= 0 ? 1 : clamp(-r.top / span, 0, 1);
-    }
-
-    function layout() {
-      if (cine !== (!mqReduce.matches && hasRoom())) computeMode();
-      var t = progress();
-
-      if (cine) {
-        if (!natural) measure();
-        var vw = window.innerWidth, vh = window.innerHeight;
-        var m0 = Math.min(vw, vh), rest0 = restingPlace();
-
-        /* headline: low and large, flying up into its column */
-        var e = ease(clamp((t - 0.16) / 0.42, 0, 1));
-        var startCx = vw / 2, startCy = vh * 0.72, startScale = 1.5;
-        var dx = lerp(startCx - natural.cx, 0, e);
-        var dy = lerp(startCy - natural.cy, 0, e);
-        var sc = lerp(startScale, 1, e);
-        h1wrap.style.transform =
-          'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')';
-
-        /* the phone is uncovered as the moon swings away */
-        var pf = clamp((t - 0.20) / 0.24, 0, 1);
-        phone.style.opacity = pf;
-        phone.style.transform = 'translateY(' + lerp(26, 0, ease(pf)) + 'px)';
-
-        /* supporting copy arrives once the headline has landed */
-        var sf = clamp((t - 0.56) / 0.24, 0, 1);
-        subEl.style.opacity = sf; ctaEl.style.opacity = sf;
-        subEl.style.transform = ctaEl.style.transform =
-          'translateY(' + lerp(18, 0, ease(sf)) + 'px)';
-
-        if (cue) cue.style.opacity = clamp(1 - t * 6, 0, 1);
-
-        var pt = pathAt(t);
-        /* Tie the dimming to how big the moon still is rather than to the
-           scroll position. On a straight run into the phone it crosses the
-           headline, and it is exactly while it is large that white type
-           needs the help. By the time it lands it is clear again. */
-        var big = clamp((pt.S - rest0.S) / Math.max(1, m0 * 0.72 - rest0.S), 0, 1);
-        if (veil) veil.style.opacity = (big * 0.82).toFixed(3);
-        h1wrap.style.textShadow = big > 0.02
-          ? '0 0 42px rgba(6,8,14,' + (0.95 * big).toFixed(3) + ')'
-          : '';
-
-        place(pt.cx, pt.cy, pt.S);
-      } else {
-        if (veil) veil.style.opacity = '0';
-        var rest = restingPlace();
-        place(rest.cx, rest.cy, rest.S);
-      }
-    }
-
-    /* ==================================================================
-       Starfield. Slow drift, faint parallax, nothing that competes.
-       ================================================================== */
-    var updateStars = (function stars() {
-      var c = document.getElementById('stars');
-      if (!c) return function () {};
-      var x = c.getContext('2d');
-      if (!x) return function () {};
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-      function seed() {
-        var W = window.innerWidth, H = window.innerHeight + 400;
-        c.width = W * dpr; c.height = H * dpr;
-        x.setTransform(dpr, 0, 0, dpr, 0, 0);
-        x.clearRect(0, 0, W, H);
-        var n = Math.round(Math.min(210, (W * H) / 11000));
-        for (var i = 0; i < n; i++) {
-          var r = Math.random() * 1.05 + 0.25;
-          x.globalAlpha = Math.random() * 0.5 + 0.12;
-          x.fillStyle = i % 9 === 0 ? '#9CC6F0' : '#E7ECF5';
-          x.beginPath();
-          x.arc(Math.random() * W, Math.random() * H, r, 0, 6.283);
-          x.fill();
-        }
-        x.globalAlpha = 1;
-      }
-      seed();
-      window.addEventListener('resize', seed);
-
-      return function (sy) {
-        /* Bounded so it never has to wrap, which would show as a jump. */
-        var ty = -180 * (sy / (sy + 2600));
-        c.style.transform = 'translate3d(0,' + ty.toFixed(1) + 'px,0)';
-      };
-    })();
-
-    /* ==================================================================
-       Reveals. Added from script so a browser without it shows everything.
-       ================================================================== */
-    (function reveals() {
-      if (mqReduce.matches || !('IntersectionObserver' in window)) return;
-      var sel = '.stat > *, section > .mono, section > h2, section > .lede,'
-              + ' section > .kicker, ul.doors li, .card, .privacy > *, .closer > *';
-      var items = [].slice.call(document.querySelectorAll(sel))
-        .filter(function (el) { return !stagefix.contains(el); });
-      items.forEach(function (el) { el.classList.add('rv'); });
-
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) {
-          if (!en.isIntersecting) return;
-          var el = en.target;
-          var sibs = [].slice.call(el.parentNode.children).filter(function (n) {
-            return n.classList.contains('rv');
-          });
-          el.style.transitionDelay = Math.min(sibs.indexOf(el), 4) * 80 + 'ms';
-          el.classList.add('rv-on');
-          io.unobserve(el);
-        });
-      }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12 });
-      items.forEach(function (el) { io.observe(el); });
-    })();
-
-    /* ================================================================== */
-    /* The spin needs a frame every tick; the layout does not. Recomputing it
-       only when the scroll actually moved keeps a forced reflow out of the
-       steady state. */
-    var PERIOD = 44000, t0 = null, lastScroll = -1, needLayout = true;
-    function frame(ts) {
-      if (t0 === null) t0 = ts;
-      var sy = window.scrollY || 0;
-      if (needLayout || sy !== lastScroll) {
-        lastScroll = sy; needLayout = false;
-        layout(); updateStars(sy);
-      }
-      if (ready && drawMoon) {
-        drawMoon(mqReduce.matches ? 0.6 : ((ts - t0) % PERIOD) / PERIOD * 6.2831853);
-      }
-      requestAnimationFrame(frame);
-    }
-
-    /* A resize can cross the size threshold, and some browsers report a zero
-       sized viewport for the first frames, so the mode is re-decided here
-       rather than trusted from load. */
-    function hardRelayout() {
-      needLayout = true;
-      computeMode(); measure(); layout();
-      if (ready && drawMoon) drawMoon(0.6);
-    }
-    window.addEventListener('resize', hardRelayout);
-    window.addEventListener('orientationchange', hardRelayout);
-    document.addEventListener('visibilitychange', hardRelayout);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(hardRelayout);
-
-    computeMode();
-    measure();
-    layout();
-    requestAnimationFrame(frame);
   })();
   </script>
 </body>
