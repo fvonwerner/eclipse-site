@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Eclipse: social screen time</title>
-  <meta name="description" content="Set a daily limit on the apps you choose, keep a streak, and put the phone down with friends. Your screen time is measured by iOS and stays on your phone.">
+  <meta name="description" content="A hard daily limit on the apps that take your day. When it runs out, the only way past it is asking a friend. Free, for iPhone.">
   <meta name="author" content="Friedrich von Werner">
   <link rel="canonical" href="https://fvonwerner.github.io/eclipse-site/">
   <meta property="og:title" content="Eclipse: social screen time">
-  <meta property="og:description" content="Set a daily limit on the apps you choose, keep a streak, and put the phone down with friends. Your screen time is measured by iOS and stays on your phone.">
+  <meta property="og:description" content="A hard daily limit on the apps that take your day. When it runs out, the only way past it is asking a friend. Free, for iPhone.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://fvonwerner.github.io/eclipse-site/">
   <meta property="og:image" content="https://fvonwerner.github.io/eclipse-site/eclipse-home.png">
@@ -41,9 +41,9 @@
 
     .wrap { max-width: 66rem; margin: 0 auto; padding: 0 1.5rem; position: relative; z-index: 1; }
     .corona {
-      position: absolute; top: -18rem; left: 50%; transform: translateX(-50%);
-      width: 60rem; height: 60rem; pointer-events: none; z-index: 0;
-      background: radial-gradient(circle, rgba(99, 205, 230, 0.16) 0%, rgba(127, 176, 232, 0.07) 34%, rgba(6, 8, 14, 0) 62%);
+      position: absolute; top: -20rem; left: 50%; transform: translateX(-50%);
+      width: 64rem; height: 64rem; pointer-events: none; z-index: 0;
+      background: radial-gradient(circle, rgba(99, 205, 230, 0.17) 0%, rgba(127, 176, 232, 0.07) 34%, rgba(6, 8, 14, 0) 62%);
     }
 
     .mono { font-family: var(--mono); font-weight: 500; text-transform: uppercase;
@@ -54,11 +54,12 @@
     .brand span { font-size: 1.375rem; font-weight: 700; font-variation-settings: "wdth" 125; letter-spacing: -0.01em; }
     .appicon { border-radius: 22.5%; display: block; }
 
-    .hero { display: grid; gap: 3rem; align-items: center; padding: 3rem 0 1rem; }
-    h1 { font-size: 2.75rem; line-height: 1.06; letter-spacing: -0.025em; font-weight: 800;
+    /* ---------- hero ---------- */
+    .hero { display: grid; gap: 3rem; align-items: center; padding: 2.5rem 0 1rem; }
+    h1 { font-size: 2.5rem; line-height: 1.05; letter-spacing: -0.03em; font-weight: 800;
          font-variation-settings: "wdth" 125; }
-    h1 .glow { color: var(--sagelight); text-shadow: 0 0 32px rgba(73, 215, 162, 0.45); }
-    .hero p.sub { margin-top: 1.5rem; max-width: 44ch; font-size: 1.125rem; line-height: 1.6; color: var(--ink2); }
+    h1 .glow { color: var(--sagelight); text-shadow: 0 0 34px rgba(73, 215, 162, 0.45); }
+    .hero p.sub { margin-top: 1.5rem; max-width: 46ch; font-size: 1.125rem; line-height: 1.6; color: var(--ink2); }
     .cta { margin-top: 2.25rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.25rem; }
     .button {
       display: inline-block; background: linear-gradient(180deg, var(--sagelight), var(--sage));
@@ -73,19 +74,52 @@
     .phone { width: 258px; margin: 0 auto; border-radius: 2.75rem; background: #000;
              padding: 8px; border: 1px solid var(--line);
              box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.9), 0 0 80px -20px rgba(99, 205, 230, 0.22); }
-    .phone img { width: 100%; height: auto; border-radius: 2.3rem; display: block; }
+    .screen { position: relative; border-radius: 2.3rem; overflow: hidden; }
+    .screen img { width: 100%; height: auto; display: block; }
 
+    /* The moon on the phone is live: an equirectangular lunar map scrolled
+       behind a circular mask, so the sphere actually turns. The strip is the
+       map plus its mirror, which tiles with no seam. */
+    .moonlive {
+      position: absolute; left: 50.54%; top: 24.9%; width: 35%; aspect-ratio: 1;
+      transform: translate(-50%, -50%); border-radius: 50%; overflow: hidden;
+      box-shadow: 0 0 26px 6px rgba(73, 215, 162, 0.16),
+                  0 0 64px 18px rgba(73, 215, 162, 0.07);
+    }
+    .moonskin {
+      position: absolute; top: 0; bottom: 0; left: 0; width: 800%;
+      background: url("moon-map.jpg") repeat-x; background-size: 50% 100%;
+      animation: moonroll 76s linear infinite;
+    }
+    @keyframes moonroll { to { transform: translateX(-50%); } }
+    .moonlive::after {
+      content: ""; position: absolute; inset: 0; border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 46%),
+        radial-gradient(circle at 74% 76%, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0) 60%);
+      box-shadow: inset -12px -8px 26px rgba(0, 0, 0, 0.7),
+                  inset 12px 4px 22px rgba(99, 205, 230, 0.20);
+    }
+
+    /* ---------- sections ---------- */
     section { border-top: 1px solid var(--line); padding: 4rem 0; }
-    h2 { font-size: 1.875rem; letter-spacing: -0.02em; font-weight: 800; font-variation-settings: "wdth" 118; }
+    h2 { font-size: 1.875rem; letter-spacing: -0.025em; font-weight: 800; font-variation-settings: "wdth" 118;
+         line-height: 1.12; }
     .lede { margin-top: 1rem; max-width: 58ch; color: var(--ink2); line-height: 1.65; }
-    .kicker { margin-top: 2rem; max-width: 58ch; line-height: 1.65; color: var(--ink); }
+    .kicker { margin-top: 1.5rem; max-width: 58ch; line-height: 1.65; color: var(--ink); }
+
+    .stat { text-align: center; padding: 4.5rem 0; }
+    .statbig { font-size: 4rem; line-height: 1; font-weight: 800; font-variation-settings: "wdth" 125;
+               letter-spacing: -0.04em; color: var(--sunset); }
+    .stat p { margin: 1.25rem auto 0; max-width: 46ch; color: var(--ink2); line-height: 1.65; }
+    .stat .src { margin-top: 1.25rem; font-size: 0.8125rem; color: var(--ink3); }
 
     ul.doors { list-style: none; margin-top: 2.5rem; }
     ul.doors li { display: grid; gap: 0.375rem; padding: 1.375rem 0; border-top: 1px solid var(--line); }
     ul.doors li:first-child { border-top: none; padding-top: 0; }
     .doorname { display: flex; align-items: center; gap: 0.75rem; font-weight: 700; font-size: 1.0625rem; }
     .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-    .doordesc { color: var(--ink2); line-height: 1.65; padding-left: 21px; max-width: 52ch; }
+    .doordesc { color: var(--ink2); line-height: 1.65; padding-left: 21px; max-width: 54ch; }
 
     .split { display: grid; gap: 3rem; align-items: center; margin-top: 2.5rem; }
     .cards { display: grid; gap: 1rem; }
@@ -94,11 +128,23 @@
     .card p { margin-top: 0.5rem; color: var(--ink2); line-height: 1.6; font-size: 0.9375rem; }
     .pip { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 
+    .price { display: grid; gap: 0.75rem; margin: 2rem 0 0; max-width: 34rem; }
+    .prow { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+            padding: 0.875rem 0; border-bottom: 1px solid var(--line); }
+    .prow span:first-child { color: var(--ink2); }
+    .prow span:last-child { font-family: var(--mono); font-size: 0.9375rem; color: var(--ink2); white-space: nowrap; }
+    .prow.us span { color: var(--sagelight); font-weight: 700; }
+    .prow.us span:last-child { font-weight: 500; }
+
     .privacy { border-radius: 24px; background: var(--bg2); border: 1px solid var(--line);
                padding: 2rem; margin: 4rem 0 0; }
     .privacy h2 { color: var(--sagelight); }
     .privacy p { margin-top: 1.125rem; max-width: 62ch; line-height: 1.65; color: var(--ink2); }
     .privacy strong { color: var(--ink); font-weight: 600; }
+
+    .closer { text-align: center; padding: 5rem 0 1rem; border-top: 1px solid var(--line); }
+    .closer h2 { max-width: 20ch; margin: 0 auto; }
+    .closer .cta { justify-content: center; margin-top: 2rem; flex-direction: column; gap: 0.875rem; }
 
     footer { border-top: 1px solid var(--line); padding: 2.5rem 0 3rem; margin-top: 4rem;
              display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
@@ -108,11 +154,12 @@
     footer .right p + p { margin-top: 0.3125rem; }
 
     @media (min-width: 820px) {
-      .hero { grid-template-columns: 1.05fr 1fr; padding: 4.5rem 0 2rem; }
-      h1 { font-size: 3.625rem; }
+      .hero { grid-template-columns: 1.08fr 1fr; padding: 4rem 0 2rem; }
+      h1 { font-size: 3.5rem; }
       .phone { width: 292px; }
       section { padding: 5.5rem 0; }
       h2 { font-size: 2.25rem; }
+      .statbig { font-size: 6rem; }
       ul.doors li { grid-template-columns: 300px 1fr; gap: 1.5rem; align-items: baseline; }
       .doordesc { padding-left: 0; }
       .split { grid-template-columns: 1fr 300px; gap: 4rem; }
@@ -121,6 +168,7 @@
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       .button { transition: none; }
+      .moonskin { animation: none; }
     }
   </style>
 </head>
@@ -133,83 +181,122 @@
         <img class="appicon" src="eclipse-icon.png" alt="" width="30" height="30">
         <span>Eclipse</span>
       </div>
-      <span class="mono">For iPhone</span>
+      <span class="mono">Free · For iPhone</span>
     </header>
 
     <section class="hero" style="border-top: none">
       <div>
-        <h1>Screen time you keep, <span class="glow">together</span>.</h1>
-        <p class="sub">Eclipse puts a daily limit on the apps you choose. Stay inside it and grow a streak. Put the phone down on purpose and a few friends are doing it with you.</p>
+        <h1>The way past your limit is not a button. It is a <span class="glow">person</span>.</h1>
+        <p class="sub">Eclipse puts a hard daily limit on the apps that eat your day. When it runs out, it runs out. There is no "15 more minutes", no talking yourself into it at 1am. If you genuinely need more time, you ask a friend, and they decide.</p>
         <div class="cta">
-          <a class="button" href="https://testflight.apple.com/join/ADW7nST8">Join the TestFlight beta</a>
-          <p class="ctanote">Free, iPhone, iOS 26 or newer.<br>The beta is capped at 100 people.</p>
+          <a class="button" href="https://testflight.apple.com/join/ADW7nST8">Get Eclipse free</a>
+          <p class="ctanote">Free, iPhone, iOS 26 or newer.<br>No subscription and no trial.</p>
         </div>
       </div>
       <div class="phone">
-        <img src="eclipse-home.png" width="644" height="1400" loading="eager"
-             alt="Eclipse's home screen in dark mode: the Moon floating above an 8 day streak, about 53 minutes of screen time today, 8 minutes of a one hour limit used, time down today and pickups today, and this week's bars">
+        <div class="screen">
+          <img src="eclipse-home.png" width="644" height="1400" loading="eager"
+               alt="Eclipse's home screen in dark mode: the Moon floating above an 8 day streak, about 53 minutes of screen time today, 8 minutes of a one hour limit used, time down today and pickups today, and this week's bars">
+          <div class="moonlive" aria-hidden="true"><div class="moonskin"></div></div>
+        </div>
       </div>
     </section>
 
+    <section class="stat">
+      <div class="statbig">4.8 hours</div>
+      <p>That is how long the average American teenager spends on social media every day. Not on their phone. On social media alone. Over a year it adds up to seventy three days, awake, gone.</p>
+      <p class="src">Gallup, Familial &amp; Adolescent Health Survey, 2023</p>
+    </section>
+
     <section>
-      <p class="mono">The wall</p>
-      <h2>When time is up, it is up.</h2>
-      <p class="lede">Once today's budget is spent, your tracked apps close behind a quiet screen. There are two ways forward from it, and neither one is a &ldquo;keep scrolling anyway&rdquo; button.</p>
+      <p class="mono">Why a friend</p>
+      <h2>Willpower is the thing that already failed.</h2>
+      <p class="lede">Every screen time app asks the same person who opened Instagram to also be the person who stops. That is you against yourself at your worst moment, and you have been losing that argument for years. It is not a character flaw. These apps are built by thousands of people whose whole job is to keep you scrolling.</p>
+      <p class="kicker">So Eclipse changes who is in the room. Your limit, your streak and your kept days are visible to a handful of friends you chose. Not a feed, not followers, not strangers: three or four people who will notice. Breaking a promise is easy when nobody is watching and surprisingly hard when someone is.</p>
+      <p class="kicker">This is the oldest trick in behaviour change, and it is the one that works. It is why people run with a friend instead of alone, and why the gym buddy who is waiting outside beats every alarm you have ever set.</p>
+    </section>
+
+    <section>
+      <p class="mono">When time is up</p>
+      <h2>A wall, and one human door.</h2>
+      <p class="lede">Most apps hand you an escape hatch and call it flexibility: a snooze, an "ignore limit", a setting you can raise in four taps at exactly the moment you should not. Eclipse closes those. When today's budget is spent, your tracked apps close, and there is no button anywhere that says keep going.</p>
       <ul class="doors">
         <li>
           <div class="doorname"><span class="dot" style="background: var(--sage)"></span>Close it</div>
-          <p class="doordesc">Put the phone down and the day counts as kept. Your streak grows by one. Reaching your limit is a success, so the whole app stays green when you land on it.</p>
+          <p class="doordesc">Put the phone down and the day counts as kept. Your streak grows by one. Reaching your limit is a success, not a failure, so the whole app stays green when you land on it.</p>
         </li>
         <li>
-          <div class="doorname"><span class="dot" style="background: var(--honey)"></span>Take two minutes</div>
-          <p class="doordesc">For the message that genuinely cannot wait: two minutes, granted the moment you tap, in the app you tapped from. Three a day, then a cooldown. Your streak survives all three.</p>
+          <div class="doorname"><span class="dot" style="background: var(--honey)"></span>Two minutes, right now</div>
+          <p class="doordesc">For the message that genuinely cannot wait. Two minutes, granted the instant you tap, in the app you tapped from. Three a day and then a cooldown. Your streak survives all three.</p>
+        </li>
+        <li>
+          <div class="doorname"><span class="dot" style="background: var(--frost)"></span>Ask a friend</div>
+          <p class="doordesc">The real emergency door. Ask your circle for fifteen minutes, an hour, or the rest of the day, and say why. The first yes opens it. You do not have to raise your limit, and you do not have to delete Eclipse to get your evening back. A day a friend helped is its own calm blue on your calendar: never a broken streak, and never a day you can pretend you earned.</p>
         </li>
       </ul>
-      <p class="kicker">And if you need a real exception, one friend can open it for you. You name a single anchor, and only their gift of time unlocks you. Days an anchor helped are their own calm blue on your calendar: never a kept day you did not earn, never a broken streak either.</p>
+      <p class="kicker">Raising your limit is always possible, because this is your phone and we are not going to pretend otherwise. It just costs your streak, and Eclipse says so before you confirm. Tightening is free. Loosening is not.</p>
+    </section>
+
+    <section>
+      <p class="mono">Six in the morning</p>
+      <h2>Your day resets at 6am, not midnight.</h2>
+      <p class="lede">A budget that refills at midnight refills at the exact moment it can do the most damage: lights off, in bed, nothing left to do tomorrow that a fresh hour of scrolling cannot ruin. Every app does this, and every app is wrong about it.</p>
+      <p class="kicker">Eclipse rolls the day over at six in the morning. If you hit your limit at 11pm, midnight is not a reward, and the new day arrives when you are awake and it can actually do you some good. Your sleep is most of the reason to do any of this in the first place.</p>
     </section>
 
     <section>
       <p class="mono">Phone down</p>
-      <h2>The good version of a competition.</h2>
+      <h2>The good kind of competition.</h2>
       <div class="split">
         <div class="cards">
           <div class="card">
-            <h3><span class="pip" style="background: var(--sage)"></span>Lock the whole phone, on purpose</h3>
-            <p>Start a session and everything closes, not just the apps you track. Invite whoever is already down and you finish together.</p>
+            <h3><span class="pip" style="background: var(--sage)"></span>Put the phone down on purpose</h3>
+            <p>Start a session and the whole phone closes, not just the apps you track. Invite whoever is already down and you finish together.</p>
           </div>
           <div class="card">
-            <h3><span class="pip" style="background: var(--dusk)"></span>A weekly board that counts the right thing</h3>
-            <p>It ranks the minutes you chose to be unreachable, never the hours you spent scrolling. Nobody wins by having a worse week.</p>
+            <h3><span class="pip" style="background: var(--dusk)"></span>A board that counts the right thing</h3>
+            <p>It ranks the minutes you chose to be unreachable, never the hours you lost. Nobody wins by having a worse week.</p>
           </div>
           <div class="card">
-            <h3><span class="pip" style="background: var(--honey)"></span>Finish and get paid in fuel</h3>
-            <p>A finished session pays fuel, and friends still down at the end pay you a bonus. Fuel buys 3D bodies to keep on your home screen: asteroids up to galaxies, 33 of them. It buys nothing else. Money and fuel can never buy time through the wall.</p>
-          </div>
-          <div class="card">
-            <h3><span class="pip" style="background: var(--sunset)"></span>Stopping early pays nothing</h3>
-            <p>The session tells you so before you confirm. The minutes still count on the board, because you were still off your phone for them.</p>
+            <h3><span class="pip" style="background: var(--honey)"></span>Something to show for it</h3>
+            <p>Finishing pays fuel, and friends still down at the end pay you a bonus. Fuel buys 3D bodies for your home screen, asteroids up to galaxies. It buys nothing else. Neither fuel nor money can ever buy time through your limit.</p>
           </div>
         </div>
         <div class="phone">
-          <img src="eclipse-down.png" width="644" height="1400" loading="lazy"
-               alt="Eclipse's phone down screen: this week's ranking of friends by phone down minutes, and a Start a session button">
+          <div class="screen">
+            <img src="eclipse-down.png" width="644" height="1400" loading="lazy"
+                 alt="Eclipse's phone down screen: this week's ranking of friends by phone down minutes, and a Start a session button">
+          </div>
         </div>
       </div>
     </section>
 
     <section>
-      <p class="mono">Your circle</p>
-      <h2>Small, invited, and honest.</h2>
-      <p class="lede">Every person claims a short tag. You add a friend by typing theirs, they approve it, and that is the entire join flow. No feed, no follower count, no strangers.</p>
-      <p class="kicker">What a friend sees is the promise you made and whether you kept it: your daily limit, your streak, how recent days ended, and the minutes you chose to put the phone down. What they never see is your screen time, the apps you picked, or anyone else in your circle.</p>
-      <p class="kicker">When you really are stuck, you can ask the circle for time on the wall of shame, out loud, to the people you picked. The first yes ends it. It is meant to be slightly embarrassing, which is most of why it works.</p>
+      <p class="mono">The price</p>
+      <h2>All of it, free.</h2>
+      <p class="lede">Screen time apps have quietly become expensive. The popular ones run between thirty and a hundred dollars a year, and one of them asks $399 for a lifetime licence. Their free tiers are usually built to be just annoying enough that you pay.</p>
+      <div class="price">
+        <div class="prow"><span>A well known focus app</span><span>$99.99 / year</span></div>
+        <div class="prow"><span>Another, with a lifetime option</span><span>$44.99 / year</span></div>
+        <div class="prow"><span>A third, the cheap one</span><span>$29.99 / year</span></div>
+        <div class="prow us"><span>Eclipse, everything on this page</span><span>$0</span></div>
+      </div>
+      <p class="kicker">There is no paid tier, no locked feature and no trial that expires. The limit, the friend circle, the emergency door, the sessions, all of it is simply the app.</p>
+      <p class="kicker">The reason is not generosity, it is arithmetic. The people this problem hurts most are the ones least able to pay to fix it. A fifteen year old losing five hours a day is not going to talk a parent into a hundred dollar subscription for an app whose entire promise is to make their phone less fun. Charging them would mean building something that only reaches the people who need it least.</p>
     </section>
 
     <div class="privacy">
       <h2>Private by construction.</h2>
       <p>Your screen time is measured by iOS itself, on your phone, and it does not leave. Eclipse has no server and no analytics SDK. Even inside the app, Apple's frameworks hand it coarse threshold events rather than a record of what you looked at.</p>
-      <p>The circle is optional, and it costs nothing to skip: a fresh install creates no account and no cloud data at all until you claim a tag or add someone. When you do, <strong>each friendship gets its own private Apple CloudKit share</strong>, so a friend can only ever read the one made for the two of you.</p>
-      <p>And the day turns over at six in the morning, not at midnight, because a budget that refills at 00:00 refills exactly when you least need it to.</p>
+      <p>Your friends see the promise you made and whether you kept it: your limit, your streak, which days you kept. <strong>They never see your screen time, the apps you picked, or anyone else in your circle.</strong> The circle is optional too, and skipping it costs nothing: a fresh install creates no account and no cloud data at all until you claim a tag or add someone.</p>
+    </div>
+
+    <div class="closer">
+      <h2>Start with one friend and a number you can live with.</h2>
+      <div class="cta">
+        <a class="button" href="https://testflight.apple.com/join/ADW7nST8">Get Eclipse free</a>
+        <p class="ctanote">iPhone, iOS 26 or newer. The beta is capped at 100 people.</p>
+      </div>
     </div>
 
     <footer>
