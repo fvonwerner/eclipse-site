@@ -41,9 +41,12 @@
     a { color: var(--sage); }
 
     /* ---------- atmosphere ---------- */
+    /* Drawn once and parallaxed with a transform. Repainting a few hundred
+       stars every frame is a real cost for pure ambience. */
     #stars {
-      position: fixed; inset: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: 0;
+      position: fixed; left: 0; top: -200px; width: 100%;
+      height: calc(100vh + 400px);
+      pointer-events: none; z-index: 0; will-change: transform;
     }
     .grain {
       position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.035;
@@ -111,7 +114,6 @@
       position: absolute; left: 0; top: 0; z-index: 3; opacity: 0;
       pointer-events: none; will-change: transform;
     }
-    .moonlive.behind { z-index: 1; }
     .moonglow {
       position: absolute; inset: -42%; border-radius: 50%; pointer-events: none;
       background: radial-gradient(circle,
@@ -221,7 +223,7 @@
     /* The pinned flight only runs where there is room for it. Script owns that
        decision and sets .cine, so the styles below key off the class alone and
        CSS can never disagree with the maths driving the flight. */
-    body.cine .stage { height: 340vh; }
+    body.cine .stage { height: 220vh; }
     body.cine .stagefix {
       position: sticky; top: 0; height: 100vh;
       display: flex; flex-direction: column; justify-content: center;
@@ -497,7 +499,14 @@
            equator is minified and plain LINEAR sampling crawls. */
         var dpr = Math.min(window.devicePixelRatio || 1, 3);
         var css = cv.clientWidth || 100;
-        var want = Math.min(1400, Math.max(96, Math.round(css * dpr * 2)));
+        /* Supersampling earns its keep only while the sphere is small and the
+           texture is minified. A large moon is already magnified, so drop it
+           and cap the buffer, or the opening frame costs millions of pixels
+           of a fairly expensive shader. Quantised so a continuously changing
+           size does not reallocate the buffer on every single frame. */
+        var ss = css > 260 ? 1.25 : 2;
+        var want = Math.round(css * dpr * ss / 64) * 64;
+        want = Math.min(800, Math.max(128, want));
         if (want !== size) {
           size = want; cv.width = size; cv.height = size;
           gl.viewport(0, 0, size, size);
@@ -526,9 +535,8 @@
 
     /* ==================================================================
        The flight. One pinned screen: the moon starts huge and centred with
-       the headline low beneath it, swings wide to uncover the phone, passes
-       behind it, comes back around the far side and settles into the spot
-       it occupies on the home screen.
+       the headline low beneath it, then travels straight into the spot it
+       occupies on the home screen as the headline rises into its column.
        ================================================================== */
     var stage    = document.getElementById('stage');
     var stagefix = document.getElementById('stagefix');
@@ -564,7 +572,7 @@
       }
       natural = null;
     }
-    function onModeChange() { computeMode(); measure(); layout(); }
+    function onModeChange() { needLayout = true; computeMode(); measure(); layout(); }
     if (mqReduce.addEventListener) mqReduce.addEventListener('change', onModeChange);
     else if (mqReduce.addListener) mqReduce.addListener(onModeChange);
 
@@ -581,33 +589,16 @@
                S:  s.width * 0.36 };
     }
 
-    /* Waypoints, resolved against the live phone rect so the path holds at
-       any window size. Each is [t, cx, cy, size]. */
+    /* One straight, eased move from the opening position into the phone.
+       No orbit, so the moon never needs to change depth and the whole flight
+       is two points and an easing curve. */
     function pathAt(t) {
       var vw = window.innerWidth, vh = window.innerHeight, m = Math.min(vw, vh);
-      var pr = phone.getBoundingClientRect();
-      var pcx = pr.left + pr.width / 2, pcy = pr.top + pr.height / 2;
       var rest = restingPlace();
-      var keys = [
-        [0.00, vw * 0.50,               vh * 0.37,               m * 0.72],
-        [0.20, vw * 0.50,               vh * 0.37,               m * 0.72],
-        [0.34, vw * 0.20,               vh * 0.15,               m * 0.44],
-        [0.50, vw * 0.48,               vh * 0.07,               m * 0.30],
-        [0.66, pcx,                     pcy - pr.height * 0.08,  m * 0.20],
-        [0.78, pr.right + pr.width*0.60, pcy + pr.height * 0.04, m * 0.16],
-        [0.89, pcx + pr.width * 0.14,   pr.top - pr.height*0.24, m * 0.12],
-        [1.00, rest.cx,                 rest.cy,                 rest.S]
-      ];
-      for (var i = 0; i < keys.length - 1; i++) {
-        var a = keys[i], b = keys[i + 1];
-        if (t <= b[0] || i === keys.length - 2) {
-          var span = b[0] - a[0];
-          var k = span <= 0 ? 1 : ease(clamp((t - a[0]) / span, 0, 1));
-          return { cx: lerp(a[1], b[1], k), cy: lerp(a[2], b[2], k),
-                   S: lerp(a[3], b[3], k) };
-        }
-      }
-      return { cx: keys[0][1], cy: keys[0][2], S: keys[0][3] };
+      var k = ease(clamp((t - 0.18) / 0.82, 0, 1));
+      return { cx: lerp(vw * 0.50, rest.cx, k),
+               cy: lerp(vh * 0.37, rest.cy, k),
+               S:  lerp(m * 0.72,  rest.S,  k) };
     }
 
     var natural = null;
@@ -616,19 +607,6 @@
       h1wrap.style.transform = 'none';
       var r = h1wrap.getBoundingClientRect();
       natural = { cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
-    }
-
-    /* z-order only ever changes while the moon is clear of the phone, so the
-       swap from in-front to behind and back is never visible. */
-    var isBehind = false;
-    function setDepth(wantBehind, cx, cy, S) {
-      if (wantBehind === isBehind) return;
-      var pr = phone.getBoundingClientRect();
-      var overlaps = Math.abs(cx - (pr.left + pr.width / 2)) < (pr.width + S) / 2
-                  && Math.abs(cy - (pr.top + pr.height / 2)) < (pr.height + S) / 2;
-      if (overlaps) return;
-      isBehind = wantBehind;
-      moonEl.classList.toggle('behind', wantBehind);
     }
 
     function place(cx, cy, S) {
@@ -654,6 +632,7 @@
       if (cine) {
         if (!natural) measure();
         var vw = window.innerWidth, vh = window.innerHeight;
+        var m0 = Math.min(vw, vh), rest0 = restingPlace();
 
         /* headline: low and large, flying up into its column */
         var e = ease(clamp((t - 0.16) / 0.42, 0, 1));
@@ -663,10 +642,6 @@
         var sc = lerp(startScale, 1, e);
         h1wrap.style.transform =
           'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')';
-        /* keeps the type readable for the stretch where it crosses the moon */
-        h1wrap.style.textShadow = e < 1
-          ? '0 0 42px rgba(6,8,14,' + (0.92 * (1 - e)).toFixed(3) + ')'
-          : '';
 
         /* the phone is uncovered as the moon swings away */
         var pf = clamp((t - 0.20) / 0.24, 0, 1);
@@ -681,10 +656,17 @@
 
         if (cue) cue.style.opacity = clamp(1 - t * 6, 0, 1);
 
-        if (veil) veil.style.opacity = clamp(1 - t / 0.40, 0, 1);
-
         var pt = pathAt(t);
-        setDepth(t > 0.44 && t < 0.85, pt.cx, pt.cy, pt.S);
+        /* Tie the dimming to how big the moon still is rather than to the
+           scroll position. On a straight run into the phone it crosses the
+           headline, and it is exactly while it is large that white type
+           needs the help. By the time it lands it is clear again. */
+        var big = clamp((pt.S - rest0.S) / Math.max(1, m0 * 0.72 - rest0.S), 0, 1);
+        if (veil) veil.style.opacity = (big * 0.82).toFixed(3);
+        h1wrap.style.textShadow = big > 0.02
+          ? '0 0 42px rgba(6,8,14,' + (0.95 * big).toFixed(3) + ')'
+          : '';
+
         place(pt.cx, pt.cy, pt.S);
       } else {
         if (veil) veil.style.opacity = '0';
@@ -696,44 +678,36 @@
     /* ==================================================================
        Starfield. Slow drift, faint parallax, nothing that competes.
        ================================================================== */
-    (function stars() {
+    var updateStars = (function stars() {
       var c = document.getElementById('stars');
-      if (!c) return;
+      if (!c) return function () {};
       var x = c.getContext('2d');
-      if (!x) return;
-      var pts = [], W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (!x) return function () {};
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
 
       function seed() {
-        W = window.innerWidth; H = window.innerHeight;
+        var W = window.innerWidth, H = window.innerHeight + 400;
         c.width = W * dpr; c.height = H * dpr;
         x.setTransform(dpr, 0, 0, dpr, 0, 0);
-        var n = Math.round(Math.min(190, (W * H) / 11000));
-        pts = [];
+        x.clearRect(0, 0, W, H);
+        var n = Math.round(Math.min(210, (W * H) / 11000));
         for (var i = 0; i < n; i++) {
-          pts.push({ x: Math.random() * W, y: Math.random() * H,
-                     r: Math.random() * 1.05 + 0.25,
-                     a: Math.random() * 0.5 + 0.12,
-                     ph: Math.random() * 6.283,
-                     sp: Math.random() * 0.55 + 0.18,
-                     d: Math.random() * 0.6 + 0.25 });
+          var r = Math.random() * 1.05 + 0.25;
+          x.globalAlpha = Math.random() * 0.5 + 0.12;
+          x.fillStyle = i % 9 === 0 ? '#9CC6F0' : '#E7ECF5';
+          x.beginPath();
+          x.arc(Math.random() * W, Math.random() * H, r, 0, 6.283);
+          x.fill();
         }
+        x.globalAlpha = 1;
       }
       seed();
       window.addEventListener('resize', seed);
 
-      window.__stars = function (ts) {
-        var off = (window.scrollY || 0) * 0.06;
-        x.clearRect(0, 0, W, H);
-        for (var i = 0; i < pts.length; i++) {
-          var s = pts[i];
-          var y = s.y - off * s.d;
-          y = ((y % H) + H) % H;
-          var tw = mqReduce.matches ? 1 : 0.68 + 0.32 * Math.sin(ts * 0.001 * s.sp + s.ph);
-          x.globalAlpha = s.a * tw;
-          x.fillStyle = i % 9 === 0 ? '#9CC6F0' : '#E7ECF5';
-          x.beginPath(); x.arc(s.x, y, s.r, 0, 6.283); x.fill();
-        }
-        x.globalAlpha = 1;
+      return function (sy) {
+        /* Bounded so it never has to wrap, which would show as a jump. */
+        var ty = -180 * (sy / (sy + 2600));
+        c.style.transform = 'translate3d(0,' + ty.toFixed(1) + 'px,0)';
       };
     })();
 
@@ -764,11 +738,17 @@
     })();
 
     /* ================================================================== */
-    var PERIOD = 44000, t0 = null;
+    /* The spin needs a frame every tick; the layout does not. Recomputing it
+       only when the scroll actually moved keeps a forced reflow out of the
+       steady state. */
+    var PERIOD = 44000, t0 = null, lastScroll = -1, needLayout = true;
     function frame(ts) {
       if (t0 === null) t0 = ts;
-      if (window.__stars) window.__stars(ts);
-      layout();
+      var sy = window.scrollY || 0;
+      if (needLayout || sy !== lastScroll) {
+        lastScroll = sy; needLayout = false;
+        layout(); updateStars(sy);
+      }
       if (ready && drawMoon) {
         drawMoon(mqReduce.matches ? 0.6 : ((ts - t0) % PERIOD) / PERIOD * 6.2831853);
       }
@@ -779,6 +759,7 @@
        sized viewport for the first frames, so the mode is re-decided here
        rather than trusted from load. */
     function hardRelayout() {
+      needLayout = true;
       computeMode(); measure(); layout();
       if (ready && drawMoon) drawMoon(0.6);
     }
