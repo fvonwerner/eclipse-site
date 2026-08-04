@@ -3,102 +3,108 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Spare: Privacy Policy</title>
-  <meta name="description" content="Spare's privacy policy: your screen time is measured by iOS and stays on your phone. Only display mirrors sync — never your hours.">
+  <title>Eclipse: Privacy Policy</title>
+  <meta name="description" content="Eclipse's privacy policy: your screen time is measured by iOS and stays on your phone. Only display mirrors sync, never your hours.">
   <meta name="author" content="Friedrich von Werner">
   <link rel="canonical" href="https://fvonwerner.github.io/ember/privacy/">
-  <link rel="icon" href="../ember-icon.png">
+  <meta name="theme-color" content="#06080E">
+  <link rel="icon" href="../eclipse-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wdth,wght@0,6..12,75..125,300..900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper: #faf6ef; --border: #ede6d9; --ink: #26221b; --ink2: #7a7264;
-      --green: #1f6650; --greensoft: #dceae0;
-      --serif: ui-serif, Georgia, "Times New Roman", serif;
-      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --bg: #06080E; --bg2: #0A0E17; --ink: #E7ECF5; --ink2: rgba(231, 236, 245, 0.60);
+      --line: rgba(142, 172, 216, 0.17); --sage: #49D7A2; --sagelight: #7BEBC4;
+      --sans: "Nunito Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { color-scheme: light; }
-    body { background: var(--paper); color: var(--ink); font-family: var(--sans); line-height: 1.6; }
+    html { color-scheme: dark; }
+    body { background: var(--bg); color: var(--ink); font-family: var(--sans);
+           line-height: 1.65; -webkit-font-smoothing: antialiased; }
     .wrap { max-width: 44rem; margin: 0 auto; padding: 0 1.5rem 4rem; }
     header { display: flex; align-items: center; gap: 0.75rem; padding: 1.5rem 0 2.5rem; }
-    header img { border-radius: 22.5%; border: 1px solid var(--border); display: block; }
-    header a { font-family: var(--serif); font-size: 1.25rem; font-weight: 600; color: var(--ink); text-decoration: none; }
-    h1 { font-family: var(--serif); font-size: 2.25rem; letter-spacing: -0.01em; margin-bottom: 0.5rem; }
+    header img { border-radius: 22.5%; display: block; }
+    header a { font-size: 1.25rem; font-weight: 700; font-variation-settings: "wdth" 125;
+               color: var(--ink); text-decoration: none; }
+    h1 { font-size: 2.25rem; letter-spacing: -0.02em; font-weight: 800;
+         font-variation-settings: "wdth" 118; margin-bottom: 0.5rem; }
     .updated { color: var(--ink2); font-size: 0.875rem; margin-bottom: 2.5rem; }
-    h2 { font-family: var(--serif); font-size: 1.375rem; margin: 2.25rem 0 0.75rem; }
-    p, li { color: var(--ink); margin-bottom: 0.75rem; max-width: 65ch; }
+    h2 { font-size: 1.3125rem; font-weight: 700; margin: 2.25rem 0 0.75rem;
+         font-variation-settings: "wdth" 110; }
+    p, li { color: var(--ink2); margin-bottom: 0.75rem; max-width: 65ch; }
+    strong { color: var(--ink); font-weight: 600; }
     ul { padding-left: 1.25rem; margin-bottom: 0.75rem; }
-    .callout { background: var(--greensoft); border-radius: 16px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
-    .callout p { margin: 0; color: var(--green); font-weight: 500; }
-    footer { border-top: 1px solid var(--border); margin-top: 3rem; padding-top: 1.5rem; font-size: 0.875rem; color: var(--ink2); }
-    footer a { color: var(--green); }
+    a { color: var(--sage); }
+    .callout { background: var(--bg2); border: 1px solid var(--line); border-radius: 18px;
+               padding: 1.375rem 1.5rem; margin: 1.5rem 0; }
+    .callout p { margin: 0; color: var(--sagelight); }
+    footer { border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 1.5rem;
+             font-size: 0.875rem; color: var(--ink2); }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <img src="../ember-icon.png" alt="Spare app icon" width="28" height="28">
-      <a href="../">Spare</a>
+      <img src="../eclipse-icon.png" alt="" width="28" height="28">
+      <a href="../">Eclipse</a>
     </header>
 
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: July 15, 2026</p>
+    <p class="updated">Last updated: August 4, 2026</p>
 
     <div class="callout">
-      <p>The short version: your screen time is measured by iOS and stays on your phone. Circle is optional. If you use it, each friendship gets a separate private Apple CloudKit share. Friends never see your hours, tracked apps, or other friends.</p>
+      <p>The short version: your screen time is measured by iOS and stays on your phone. The circle is optional, and skipping it means no account and no cloud data at all. If you use it, each friendship gets a separate private Apple CloudKit share. Friends never see your hours, your tracked apps, or your other friends.</p>
     </div>
 
     <h2>Who we are</h2>
-    <p>Spare is made by Friedrich von Werner. For privacy questions, use the contact
-    published on Spare's App Store page.</p>
+    <p>Eclipse is made by Friedrich von Werner. For privacy questions, use the contact published on Eclipse's TestFlight and App Store listing.</p>
 
     <h2>Screen time data stays on your device</h2>
-    <p>Spare uses Apple's Screen Time frameworks (Family Controls, Device Activity,
-    Managed Settings) to measure your usage of the apps you choose and to shield
-    them when your daily limit is reached. This data is processed entirely on your
-    device. Spare has no server that receives it, and we never use it for
-    advertising or share it with anyone. Apple's frameworks are designed so that
-    even Spare itself sees only coarse threshold events, not your browsing.</p>
+    <p>Eclipse uses Apple's Screen Time frameworks (Family Controls, Device Activity, Managed Settings) to measure your usage of the apps you choose and to shield them when your daily limit is reached. This is processed entirely on your device. Eclipse has no server that receives it, we never use it for advertising, and we never share it. Apple's frameworks are built so that even Eclipse itself sees coarse threshold events rather than a record of what you looked at.</p>
+
+    <h2>Nothing exists until you ask for it</h2>
+    <p>Setting up Eclipse creates no account, no identifier, and no cloud record. Those are created the first time you claim a tag or add a friend. If you never use the circle, there is nothing about you in the cloud to describe.</p>
+
+    <h2>Your tag is public on purpose</h2>
+    <p>Adding a friend means typing their tag, so tags have to be findable. When you claim one, Eclipse writes a <strong>public</strong> record holding that tag and a pointer used to set up sharing. It carries no name, no email, no phone number, and nothing about your usage. Anyone who guesses or is told your tag can see that it exists and send you a request, which you then approve or decline. Nothing else about you is readable until you approve it.</p>
 
     <h2>What syncs when you use the circle</h2>
-    <p>If you choose to use Circle, Spare creates a separate private/shared
-    Apple CloudKit zone for each friend you invite. Apple asks that person to
-    accept before either of you appears in the other's Circle. A pair share contains:</p>
+    <p>Each friend you add gets a separate private Apple CloudKit share, and both of you have to agree before either appears in the other's circle. A pair share contains:</p>
     <ul>
-      <li>your display name and an app-generated account identifier (no email or phone number),</li>
+      <li>your display name, your tag, and an app-generated account identifier (no email or phone number),</li>
       <li>your daily limit in minutes,</li>
       <li>your current streak and how each recent day ended (kept, kept with help, over, unverified),</li>
-      <li>your voluntary lockdown minutes per week (time you chose to put the phone down),</li>
-      <li>nudges, session invitations and responses, and lifeline requests/answers you deliberately send.</li>
+      <li>the minutes per week you chose to put the phone down, and the minutes per week you were given by others,</li>
+      <li>which 3D body you have equipped,</li>
+      <li>invitations, replies, requests for time, and other messages you deliberately send.</li>
     </ul>
-    <p>Circle data is not searchable and is not stored in CloudKit's public database. Each accepted friend can access only the share created for that friendship.</p>
-    <p>Never synced: your hours of usage, which apps you track, or anything about
-    what you do on your phone. Lockdown time is a timer you started on purpose —
-    not a measurement of your usage.</p>
+    <p><strong>Never synced:</strong> your hours of usage, which apps you track, or anything about what you actually do on your phone. Phone-down time is a timer you started on purpose, not a measurement of you.</p>
+    <p>Circle data is not searchable and is not stored in CloudKit's public database. Each accepted friend can reach only the share created for that one friendship, so your friends cannot see each other through you.</p>
+
+    <h2>Anonymous usage statistics</h2>
+    <p>Eclipse uploads one small anonymous record per install so the developer can tell how the app is being used overall. It holds exactly three things: how many times you have taken a two-minute unlock, how many rewarded videos you have watched, and the app's build number. It is filed under a random identifier generated for this purpose alone, which is deliberately <strong>not</strong> your circle identifier, so these counts cannot be connected to you, your circle, or each other. No Screen Time data is involved: both counters are things the app itself did.</p>
 
     <h2>Where it lives</h2>
-    <p>Circle data is stored in Apple's private/shared CloudKit databases, tied to your iCloud account, under
-    Apple's security and data-processing terms. Spare has no separate backend and
-    no analytics or tracking SDKs. There are no ads in the current version; if a
-    future version shows optional rewarded ads, they will never receive your
-    screen-time data.</p>
+    <p>Circle data is stored in Apple's private and shared CloudKit databases, tied to your iCloud account, under Apple's security and data-processing terms. Eclipse has no separate backend, no third-party analytics, and no tracking SDKs.</p>
+
+    <h2>Ads</h2>
+    <p>The current version contains no ad network. At the end of a voluntary phone-down session you may be offered a video to double the fuel you earned, and today that is a placeholder that shows no real advertising. If a real one arrives, the rule it has to obey is already fixed: it is offered only after a session you chose to run, it pays only fuel, which buys only cosmetics, and no Screen Time or Device Activity data ever reaches it, targets it, or measures it.</p>
 
     <h2>Deleting your data</h2>
-    <p>"Delete account and data" in Spare's settings deletes every friend share you own, leaves shares owned by friends, deletes the private recovery record, and then wipes local data. If CloudKit deletion fails, Spare keeps the local identity and shows an error so you can retry. Deleting the app removes local data but a small private recovery backup may restore your display name, identifier, limit, streak, and recent day outcomes after reinstalling.</p>
+    <p>"Delete account and data" in Eclipse's settings deletes every friend share you own, leaves shares owned by friends, deletes the private recovery record, and then wipes local data. If deletion in the cloud fails, Eclipse keeps the local identity and shows you an error so you can retry rather than silently pretending it worked. Deleting the app removes local data, but a small private recovery backup may restore your display name, identifier, limit, streak, recent day outcomes, and fuel balance if you reinstall.</p>
 
     <h2>Safety, reports, and blocking</h2>
-    <p>Spare filters the short user-authored strings it transports. You can report a safety concern, block an account, remove a friend, or revoke sharing from a friend's profile. Reports are prepared on your device for you to send through the system share sheet. A dedicated support contact will be published on this site and the App Store page before release.</p>
+    <p>Eclipse filters the short user-authored strings it transports. You can report a safety concern, block an account, remove a friend, or revoke sharing from a friend's profile. Reports are prepared on your device for you to send through the system share sheet.</p>
 
     <h2>Your rights</h2>
-    <p>Depending on where you live (for example under the GDPR), you may have
-    rights to access, correct, or erase personal data. The circle data described
-    above is the complete inventory; you can see it in the app and erase it with
-    "Start over" at any time, or contact us via the App Store page.</p>
+    <p>Depending on where you live (for example under the GDPR), you may have rights to access, correct, or erase personal data. The circle data described above is the complete inventory. You can see it in the app and erase it with "Start over" or "Delete account and data" at any time, or get in touch through the listing contact.</p>
 
     <h2>Changes</h2>
     <p>If this policy changes, the new version appears here with an updated date.</p>
 
     <footer>
-      <p><a href="../">Spare</a> · <a href="../terms/">Terms of Service</a> · © 2026 Friedrich von Werner</p>
+      <p><a href="../">Eclipse</a> &middot; <a href="../terms/">Terms of Service</a> &middot; &copy; 2026 Friedrich von Werner</p>
     </footer>
   </div>
 </body>
