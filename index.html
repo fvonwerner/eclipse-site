@@ -77,35 +77,17 @@
     .screen { position: relative; border-radius: 2.3rem; overflow: hidden; }
     .screen img { width: 100%; height: auto; display: block; }
 
-    /* The moon on the phone is live: an equirectangular lunar map scrolled
-       behind a circular mask, so the sphere actually turns. The strip is the
-       map plus its mirror, which tiles with no seam. */
+    /* The moon on the phone is a real sphere, ray traced per pixel in WebGL
+       against the lunar albedo map taken out of the app's own 3D model. The
+       silhouette and the terminator come from the geometry, so there is no
+       painted edge to go white or black. Falls back to a still render. */
     .moonlive {
-      position: absolute; left: 50.54%; top: 24.9%; width: 35%; aspect-ratio: 1;
-      transform: translate(-50%, -50%); border-radius: 50%; overflow: hidden;
-      box-shadow: 0 0 26px 6px rgba(73, 215, 162, 0.16),
-                  0 0 64px 18px rgba(73, 215, 162, 0.07);
+      position: absolute; left: 50.54%; top: 24.9%; width: 36%; aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 0 13px rgba(73, 215, 162, 0.30))
+              drop-shadow(0 0 30px rgba(73, 215, 162, 0.16));
     }
-    .moonskin {
-      position: absolute; top: 0; bottom: 0; left: 0; width: 800%;
-      background: url("moon-map.jpg") repeat-x; background-size: 50% 100%;
-      animation: moonroll 76s linear infinite;
-    }
-    @keyframes moonroll { to { transform: translateX(-50%); } }
-    .moonlive::after {
-      content: ""; position: absolute; inset: 0; border-radius: 50%;
-      background:
-        /* Limb darkening. Without this the raw texture stays bright right up
-           to the mask, which reads as a hard white line around the edge. */
-        radial-gradient(circle at 50% 50%,
-          rgba(0, 0, 0, 0) 52%, rgba(0, 0, 0, 0.38) 82%,
-          rgba(0, 0, 0, 0.72) 96%, rgba(0, 0, 0, 0.85) 100%),
-        radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 46%),
-        radial-gradient(circle at 74% 76%, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0) 74%);
-      box-shadow: inset -12px -8px 26px rgba(0, 0, 0, 0.7),
-                  inset 12px 4px 22px rgba(99, 205, 230, 0.20),
-                  inset 0 0 0 1px rgba(0, 0, 0, 0.55);
-    }
+    .moonlive canvas, .moonlive img { width: 100%; height: 100%; display: block; }
 
     /* ---------- sections ---------- */
     section { border-top: 1px solid var(--line); padding: 4rem 0; }
@@ -195,7 +177,7 @@
         <div class="screen">
           <img src="eclipse-home-v2.png" width="644" height="1400" loading="eager"
                alt="Eclipse's home screen in dark mode: the Moon floating above an 8 day streak, about 53 minutes of screen time today, 8 minutes of a one hour limit used, time down today and pickups today, and this week's bars">
-          <div class="moonlive" aria-hidden="true"><div class="moonskin"></div></div>
+          <div class="moonlive" aria-hidden="true"><canvas id="moon3d"></canvas></div>
         </div>
       </div>
     </section>
@@ -293,5 +275,141 @@
     </footer>
 
   </div>
+
+  <script>
+  /* A rotating moon, ray traced against a sphere one pixel at a time.
+     Texture: the base colour map lifted out of the app's own glTF body, so
+     this is the same moon the phone renders. If WebGL is missing or the
+     texture will not load, a still render of the identical shading takes
+     its place, and reduced-motion viewers get one frame instead of a loop. */
+  (function () {
+    var cv = document.getElementById('moon3d');
+    if (!cv) return;
+
+    function fallback() {
+      var img = new Image();
+      img.src = 'moon-still.png';
+      img.alt = '';
+      if (cv.parentNode) cv.parentNode.replaceChild(img, cv);
+    }
+
+    var gl;
+    try {
+      gl = cv.getContext('webgl', { alpha: true, antialias: false, depth: false })
+        || cv.getContext('experimental-webgl', { alpha: true, antialias: false, depth: false });
+    } catch (e) { gl = null; }
+    if (!gl) { fallback(); return; }
+
+    var VERT =
+      'attribute vec2 aPos;varying vec2 vUv;' +
+      'void main(){vUv=aPos;gl_Position=vec4(aPos,0.0,1.0);}';
+
+    var FRAG =
+      'precision highp float;varying vec2 vUv;uniform sampler2D uTex;' +
+      'uniform float uRot;uniform float uPx;' +
+      'void main(){' +
+      '  vec2 p=vUv;float r2=dot(p,p);' +
+      /* alpha from the analytic circle, smoothed over one pixel */
+      '  float a=1.0-smoothstep(1.0-uPx,1.0+uPx,r2);' +
+      '  if(a<=0.0){discard;}' +
+      '  float z=sqrt(max(0.0,1.0-min(r2,1.0)));' +
+      '  vec3 n=vec3(p,z);' +
+      /* spin about the vertical axis, then read the equirectangular map */
+      '  float c=cos(uRot),s=sin(uRot);' +
+      '  vec3 nr=vec3(n.x*c-n.z*s,n.y,n.x*s+n.z*c);' +
+      '  float lon=atan(nr.x,nr.z);float lat=asin(clamp(nr.y,-1.0,1.0));' +
+      '  vec2 uv=vec2(lon*0.15915494+0.5,0.5-lat*0.31830989);' +
+      '  vec3 alb=texture2D(uTex,uv).rgb;' +
+      '  vec3 L=normalize(vec3(-0.34,0.42,0.84));' +
+      '  float diff=max(dot(n,L),0.0);' +
+      '  vec3 col=alb*(0.13+0.95*diff);' +
+      /* the cool edge light the app puts on the left of the body */
+      '  float rim=pow(clamp(1.0-n.z,0.0,1.0),3.0);' +
+      '  float left=pow(clamp(-n.x*0.5+0.5,0.0,1.0),1.5);' +
+      '  col+=rim*left*0.85*vec3(0.36,0.62,0.92);' +
+      '  gl_FragColor=vec4(col*a,a);' +
+      '}';
+
+    function compile(type, src) {
+      var sh = gl.createShader(type);
+      gl.shaderSource(sh, src); gl.compileShader(sh);
+      return gl.getShaderParameter(sh, gl.COMPILE_STATUS) ? sh : null;
+    }
+    var vs = compile(gl.VERTEX_SHADER, VERT), fs = compile(gl.FRAGMENT_SHADER, FRAG);
+    if (!vs || !fs) { fallback(); return; }
+    var prog = gl.createProgram();
+    gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { fallback(); return; }
+    gl.useProgram(prog);
+
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+    var loc = gl.getAttribLocation(prog, 'aPos');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    var uRot = gl.getUniformLocation(prog, 'uRot');
+    var uPx  = gl.getUniformLocation(prog, 'uPx');
+
+    var tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    /* one grey texel so the first frames are never a flash of nothing */
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE,
+                  new Uint8Array([120, 120, 120]));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    /* REPEAT is what makes the 0/360 seam blend correctly on an equirect map */
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+    var size = 0;
+    function resize(force) {
+      var dpr = Math.min(window.devicePixelRatio || 1, 3);
+      var css = cv.clientWidth || 100;
+      var want = Math.max(64, Math.round(css * dpr));
+      if (want === size) return;
+      size = want; cv.width = size; cv.height = size;
+      gl.viewport(0, 0, size, size);
+      gl.uniform1f(uPx, 2.2 / size);
+    }
+
+    gl.clearColor(0, 0, 0, 0);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+    function draw(rot) {
+      resize();
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform1f(uRot, rot);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var PERIOD = 44000, t0 = null, ready = false;
+
+    var img = new Image();
+    img.onload = function () {
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+      ready = true;
+      /* Paint immediately rather than waiting for the animation loop. A tab
+         that loads in the background gets no rAF callbacks at all, and would
+         otherwise sit on an unsized, empty canvas until it was looked at. */
+      draw(still ? 0.6 : 0.0);
+    };
+    img.onerror = fallback;
+    img.src = 'moon-color.jpg';
+
+    if (!still) {
+      (function frame(ts) {
+        if (t0 === null) t0 = ts;
+        if (ready) draw(((ts - t0) % PERIOD) / PERIOD * 6.2831853);
+        requestAnimationFrame(frame);
+      })(0);
+    }
+  })();
+  </script>
 </body>
 </html>
