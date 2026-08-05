@@ -6,19 +6,19 @@
   <title>Eclipse: social screen time</title>
   <meta name="description" content="A hard daily limit on the apps that take your day. When it runs out, the only way past it is asking a friend. Free, for iPhone.">
   <meta name="author" content="Friedrich von Werner">
-  <link rel="canonical" href="https://fvonwerner.github.io/eclipse-site/">
+  <link rel="canonical" href="https://eclipsescreentime.com/">
   <meta property="og:title" content="Eclipse: social screen time">
   <meta property="og:description" content="A hard daily limit on the apps that take your day. When it runs out, the only way past it is asking a friend. Free, for iPhone.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://fvonwerner.github.io/eclipse-site/">
-  <meta property="og:image" content="https://fvonwerner.github.io/eclipse-site/eclipse-home-v2.png">
+  <meta property="og:url" content="https://eclipsescreentime.com/">
+  <meta property="og:image" content="https://eclipsescreentime.com/app-home.webp">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#06080E">
   <link rel="icon" href="eclipse-icon.png">
   <link rel="apple-touch-icon" href="eclipse-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wdth,wght@0,6..12,75..125,300..900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wdth,wght@0,6..12,75..125,300..900&amp;family=DM+Mono:wght@300;400;500&amp;display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #06080E; --bg2: #0A0E17; --card: #101623;
@@ -30,11 +30,17 @@
       --mono: "DM Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { color-scheme: dark; scroll-behavior: smooth; }
+    html { color-scheme: dark; scroll-behavior: smooth; overflow-x: clip; }
     body {
       background: var(--bg); color: var(--ink); font-family: var(--sans);
       font-variation-settings: "wdth" 100; line-height: 1.5;
       -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(circle at 9% 18%, rgba(99,205,230,.12), transparent 25rem),
+        radial-gradient(circle at 91% 58%, rgba(73,215,162,.08), transparent 28rem);
     }
     ::selection { background: rgba(73, 215, 162, 0.28); }
     a { color: var(--sage); }
@@ -71,9 +77,12 @@
     .button:hover { transform: translateY(-1px); box-shadow: 0 0 56px -4px rgba(73, 215, 162, 0.7); }
     .ctanote { color: var(--ink3); font-size: 0.875rem; line-height: 1.5; }
 
-    .phone { width: 258px; margin: 0 auto; border-radius: 2.75rem; background: #000;
+    .hero-visual { position: relative; min-height: 570px; display: grid; place-items: center; isolation: isolate; }
+    .phone { position: relative; z-index: 2; width: 258px; margin: 0 auto; border-radius: 2.75rem; background: #000;
              padding: 8px; border: 1px solid var(--line);
-             box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.9), 0 0 80px -20px rgba(99, 205, 230, 0.22); }
+             box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.9), 0 0 80px -20px rgba(99, 205, 230, 0.22);
+             transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+             transition: transform .35s ease; }
     .screen { position: relative; border-radius: 2.3rem; overflow: hidden; }
     .screen img { width: 100%; height: auto; display: block; }
 
@@ -82,8 +91,9 @@
        silhouette and the terminator come from the geometry, so there is no
        painted edge to go white or black. Falls back to a still render. */
     .moonlive {
-      position: absolute; left: 50.54%; top: 24.9%; width: 36%; aspect-ratio: 1;
-      transform: translate(-50%, -50%);
+      position: absolute; z-index: 1; right: -3%; top: 1%; width: min(270px, 58%); aspect-ratio: 1;
+      transform: translate3d(var(--mx, 0), var(--my, 0), 0);
+      transition: transform .5s cubic-bezier(.2,.8,.2,1);
     }
     /* The glow is its own element behind the canvas on purpose. A CSS filter
        on an ancestor makes the browser rasterize the whole subtree into a
@@ -125,6 +135,40 @@
     .card p { margin-top: 0.5rem; color: var(--ink2); line-height: 1.6; font-size: 0.9375rem; }
     .pip { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 
+    /* ---------- product tour ---------- */
+    .tour { display: grid; gap: 2.25rem; margin-top: 2.5rem; align-items: center; }
+    .tour-copy { display: grid; gap: .75rem; }
+    .tour-tab, .minute-chip {
+      appearance: none; width: 100%; color: var(--ink2); background: transparent;
+      border: 1px solid var(--line); border-radius: 16px; padding: 1rem 1.1rem;
+      font: inherit; text-align: left; cursor: pointer; transition: .2s ease;
+    }
+    .tour-tab strong { display: block; color: var(--ink); font-size: 1.05rem; }
+    .tour-tab span { display: block; margin-top: .3rem; font-size: .9rem; line-height: 1.5; }
+    .tour-tab[aria-selected="true"] { border-color: rgba(73,215,162,.6); background: rgba(73,215,162,.07); transform: translateX(6px); }
+    .product-phone { width: min(300px, 78vw); }
+    .product-phone img { aspect-ratio: 402/874; object-fit: cover; }
+    .tour-status { min-height: 1.5em; color: var(--sagelight); }
+
+    /* ---------- phone-down lab ---------- */
+    .session-lab { display: grid; gap: 2.5rem; margin-top: 2.5rem; align-items: center; }
+    .session-panel { padding: 1.5rem; border: 1px solid var(--line); border-radius: 24px;
+      background: linear-gradient(145deg, rgba(16,22,35,.95), rgba(10,14,23,.78)); }
+    .minute-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: .55rem; margin-top: 1.5rem; }
+    .minute-chip { padding: .7rem .2rem; text-align: center; border-radius: 999px; }
+    .minute-chip[aria-pressed="true"] { color: #04120C; background: var(--sage); border-color: var(--sage); font-weight: 800; }
+    .session-readout { margin-top: 1.6rem; padding-top: 1.35rem; border-top: 1px solid var(--line); }
+    .session-time { font-size: clamp(2.5rem, 8vw, 4.4rem); line-height: 1; font-weight: 850; letter-spacing: -.045em; }
+    .fuel-line { margin-top: .75rem; color: var(--honey); }
+    .demo-start { width: 100%; margin-top: 1.4rem; border: 1px solid rgba(73,215,162,.6); border-radius: 14px;
+      padding: .9rem 1rem; color: var(--sagelight); background: rgba(73,215,162,.08); font: inherit; font-weight: 800; cursor: pointer; }
+    .session-note { margin-top: 1rem; color: var(--ink3); font-size: .82rem; line-height: 1.6; }
+    .session-phone-wrap { position: relative; display: grid; place-items: center; }
+    .session-orbit { position: absolute; width: min(410px, 94vw); aspect-ratio: 1; border: 1px solid rgba(99,205,230,.14); border-radius: 50%;
+      animation: orbit 18s linear infinite; }
+    .session-orbit::after { content:""; position:absolute; width:8px; height:8px; border-radius:50%; background:var(--frost); left:12%; top:12%; box-shadow:0 0 24px var(--frost); }
+    @keyframes orbit { to { transform: rotate(1turn); } }
+
 
     .privacy { border-radius: 24px; background: var(--bg2); border: 1px solid var(--line);
                padding: 2rem; margin: 4rem 0 0; }
@@ -153,12 +197,15 @@
       ul.doors li { grid-template-columns: 300px 1fr; gap: 1.5rem; align-items: baseline; }
       .doordesc { padding-left: 0; }
       .cards { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+      .tour { grid-template-columns: minmax(0, 1fr) minmax(280px, .8fr); }
+      .session-lab { grid-template-columns: minmax(0, 1fr) minmax(280px, .85fr); }
       .privacy { padding: 3rem; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       .button { transition: none; }
-      .moonskin { animation: none; }
+      .phone, .moonlive, .tour-tab { transition: none; }
+      .session-orbit { animation: none; }
     }
   </style>
 </head>
@@ -183,12 +230,14 @@
           <p class="ctanote">Free, iPhone, iOS 26 or newer.<br>No subscription and no trial.</p>
         </div>
       </div>
-      <div class="phone">
-        <div class="screen">
-          <img src="eclipse-home-v2.png" width="644" height="1400" loading="eager"
-               alt="Eclipse's home screen in dark mode: the Moon floating above an 8 day streak, about 53 minutes of screen time today, 8 minutes of a one hour limit used, time down today and pickups today, and this week's bars">
-          <div class="moonlive" aria-hidden="true">
-            <div class="moonglow"></div><canvas id="moon3d"></canvas>
+      <div class="hero-visual" id="heroVisual">
+        <div class="moonlive" id="heroMoon" aria-hidden="true">
+          <div class="moonglow"></div><canvas id="moon3d"></canvas>
+        </div>
+        <div class="phone" id="heroPhone">
+          <div class="screen">
+            <img src="app-home.webp" width="804" height="1748" loading="eager"
+                 alt="The current Eclipse Home screen with a newly unlocked asteroid, today's screen-time limit, phone-down minutes, pickups and the week at a glance">
           </div>
         </div>
       </div>
@@ -208,6 +257,29 @@
       <p class="kicker">This is the oldest trick in behaviour change, and it is the one that works. It is why people run with a friend instead of alone, and why the gym buddy who is waiting outside beats every alarm you have ever set.</p>
     </section>
 
+    <section id="inside">
+      <p class="mono">Inside Eclipse</p>
+      <h2>One promise. Three places to keep it.</h2>
+      <p class="lede">These are current screens from the app—not illustrations. Move through them to see what Eclipse keeps close and what it deliberately leaves out.</p>
+      <div class="tour">
+        <div class="tour-copy" role="tablist" aria-label="Explore Eclipse screens">
+          <button class="tour-tab" role="tab" aria-selected="true" data-image="app-home.webp" data-alt="Eclipse Home with an equipped asteroid and today's limit" data-status="Home keeps today legible in one glance.">
+            <strong>Home</strong><span>Your limit, kept days, time down, pickups and one body earned away from the phone.</span>
+          </button>
+          <button class="tour-tab" role="tab" aria-selected="false" data-image="app-wall.webp" data-alt="The Eclipse Wall where time requests appear" data-status="The wall is small, private and useful.">
+            <strong>The wall</strong><span>Requests go to your lifeline first. After five minutes they can reach the circle; one yes ends the ask.</span>
+          </button>
+          <button class="tour-tab" role="tab" aria-selected="false" data-image="app-stats.webp" data-alt="Eclipse Stats showing time given back and the week" data-status="Progress counts what came back to you.">
+            <strong>Stats</strong><span>See the days you kept, time given back and phone-down sessions—without turning restraint into another feed.</span>
+          </button>
+        </div>
+        <div>
+          <div class="phone product-phone"><div class="screen"><img id="tourImage" src="app-home.webp" width="804" height="1748" loading="lazy" alt="Eclipse Home with an equipped asteroid and today's limit"></div></div>
+          <p class="mono tour-status" id="tourStatus" aria-live="polite">Home keeps today legible in one glance.</p>
+        </div>
+      </div>
+    </section>
+
     <section>
       <p class="mono">When time is up</p>
       <h2>A wall, and one human door.</h2>
@@ -215,11 +287,11 @@
       <ul class="doors">
         <li>
           <div class="doorname"><span class="dot" style="background: var(--honey)"></span>Two minutes, right now</div>
-          <p class="doordesc">For the message that genuinely cannot wait. Two minutes, granted the instant you tap, in the app you tapped from. Three a day and then a cooldown.</p>
+          <p class="doordesc">For the message that genuinely cannot wait. A ten-second boost opens two minutes in the app you tapped from. Three a day, then you are done.</p>
         </li>
         <li>
           <div class="doorname"><span class="dot" style="background: var(--frost)"></span>Ask a friend</div>
-          <p class="doordesc">The real emergency door. Ask your lifeline for fifteen minutes, an hour, or the rest of the day, and say why. You do not have to raise your limit, and you do not have to delete Eclipse.</p>
+          <p class="doordesc">The real emergency door. Ask your lifeline for fifteen minutes, an hour, or the rest of the day, and say why. They get the first five minutes; after that you can ask the rest of your circle. One yes settles it.</p>
         </li>
       </ul>
       <p class="kicker">Raising your limit is always possible, because this is your phone. It just costs your streak. Tightening is free. Loosening is not.</p>
@@ -233,22 +305,35 @@
       <p class="kicker">Eclipse rolls the day over at six in the morning. If you hit your limit at 11pm, midnight is not a reward, and the new day arrives when you are awake and it can actually do you some good. Your sleep is most of the reason to do any of this in the first place.</p>
     </section>
 
-    <section>
+    <section id="phone-down">
       <p class="mono">Phone down</p>
-      <h2>The good kind of competition.</h2>
+      <h2>Put it down, and let something remain.</h2>
+      <p class="lede">A session shields the whole phone. Finish it and you earn fuel for expeditions: asteroids, moons, stars and galaxies that live on Home. Stop early and it pays nothing. Try the pacing below.</p>
+      <div class="session-lab">
+        <div class="session-panel">
+          <p class="mono">Plan a session</p>
+          <div class="minute-row" aria-label="Session length">
+            <button class="minute-chip" aria-pressed="false" data-minutes="15" data-fuel="2">15m</button>
+            <button class="minute-chip" aria-pressed="false" data-minutes="30" data-fuel="3">30m</button>
+            <button class="minute-chip" aria-pressed="true" data-minutes="60" data-fuel="6">1h</button>
+            <button class="minute-chip" aria-pressed="false" data-minutes="120" data-fuel="13">2h</button>
+          </div>
+          <div class="session-readout">
+            <div class="session-time" id="sessionTime">1:00:00</div>
+            <p class="fuel-line"><span id="sessionFuel">6</span> fuel on finish · example ×1.4 body</p>
+          </div>
+          <button class="demo-start" id="demoStart">See the phone go down</button>
+          <p class="session-note">Payouts rise at every 15-minute step. Friends who are still down with you add 10% each, up to 40%. Every new install starts with one free asteroid packet, already equipped, so Home is never empty.</p>
+        </div>
+        <div class="session-phone-wrap">
+          <div class="session-orbit" aria-hidden="true"></div>
+          <div class="phone product-phone"><div class="screen"><img id="sessionImage" src="app-down.webp" width="804" height="1748" loading="lazy" alt="The current Eclipse Phone down composer"></div></div>
+        </div>
+      </div>
       <div class="cards">
-        <div class="card">
-          <h3><span class="pip" style="background: var(--sage)"></span>Put the phone down on purpose</h3>
-          <p>Start a session and the whole phone closes, not just the apps you track. iOS holds back notifications from everything it has locked, so nothing buzzes and nothing lights up the screen you just put down. Eclipse adds none of its own either: no countdown, no progress nudges, nothing engineered to pull you back.</p>
-        </div>
-        <div class="card">
-          <h3><span class="pip" style="background: var(--dusk)"></span>A board that counts the right thing</h3>
-          <p>It ranks the minutes you chose to be unreachable, never the hours you lost. Nobody wins by having a worse week.</p>
-        </div>
-        <div class="card">
-          <h3><span class="pip" style="background: var(--honey)"></span>Something to show for it</h3>
-          <p>Finishing pays fuel, and fuel buys 3D bodies for your home screen, asteroids up to galaxies. They are not decoration for its own sake. The body you are carrying is bought with hours you actually spent away from your phone, so the tier you have reached is a record of how much time you have taken back. Progress that is otherwise invisible, sitting on your home screen where you can see it.</p>
-        </div>
+        <div class="card"><h3><span class="pip" style="background: var(--sage)"></span>The whole phone rests</h3><p>The lock holds for the session you chose. The live screen is modal, so a stray swipe cannot take you elsewhere while the session runs.</p></div>
+        <div class="card"><h3><span class="pip" style="background: var(--dusk)"></span>A board that counts the right thing</h3><p>It ranks the minutes you chose to be unreachable, never the hours you lost. Nobody wins by having a worse week.</p></div>
+        <div class="card"><h3><span class="pip" style="background: var(--honey)"></span>No duplicate expeditions</h3><p>An expedition only repeats a body after you have charted every body in that tier. What you carry is a record of time you actually took back.</p></div>
       </div>
     </section>
 
@@ -262,8 +347,8 @@
 
     <div class="privacy">
       <h2>Private by construction.</h2>
-      <p>Your screen time is measured by iOS itself, on your phone, and it does not leave. Eclipse has no server and no analytics SDK. Even inside the app, Apple's frameworks hand it coarse threshold events rather than a record of what you looked at.</p>
-      <p>Your friends see the promise you made and whether you kept it: your limit, your streak, which days you kept. <strong>They never see your screen time, the apps you picked, or anyone else in your circle.</strong> The circle is optional too, and skipping it costs nothing: a fresh install creates no account and no cloud data at all until you claim a tag or add someone.</p>
+      <p>Your screen time is measured by iOS itself, on your phone. Eclipse has no advertising or behavioural-analytics SDK. Apple's frameworks provide the totals needed to enforce your promise, not a browsable history of what you looked at. Optional social features travel through your private iCloud account; a random install identifier contributes only anonymous aggregate usage counters.</p>
+      <p>Your friends see the promise you made and whether you kept it: your limit, your streak, kept days and whether you are currently phone down. <strong>They never see your screen time, the apps you picked, or anyone else in your circle.</strong> The circle is optional too, and skipping it costs nothing.</p>
     </div>
 
     <div class="closer">
@@ -410,7 +495,13 @@
     document.addEventListener('visibilitychange', repaint);
 
     var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var PERIOD = 44000, t0 = null, ready = false;
+    var PERIOD = 44000, t0 = null, ready = false, visible = true, lastFrame = 0;
+    if (window.IntersectionObserver) {
+      new IntersectionObserver(function (entries) {
+        visible = entries[0].isIntersecting;
+        if (visible) repaint();
+      }, { rootMargin: '120px' }).observe(cv);
+    }
 
     var img = new Image();
     img.onload = function () {
@@ -436,9 +527,75 @@
     if (!still) {
       (function frame(ts) {
         if (t0 === null) t0 = ts;
-        if (ready) draw(((ts - t0) % PERIOD) / PERIOD * 6.2831853);
+        /* 30fps is indistinguishable at this speed and halves the fragment
+           work. Stop drawing once the hero has left the viewport. */
+        if (ready && visible && ts - lastFrame > 33) {
+          lastFrame = ts;
+          draw(((ts - t0) % PERIOD) / PERIOD * 6.2831853);
+        }
         requestAnimationFrame(frame);
       })(0);
+    }
+  })();
+
+  /* Small, optional moments of agency. They explain the product and never
+     block reading; everything still works as a static page without JS. */
+  (function () {
+    var tourImage = document.getElementById('tourImage');
+    var tourStatus = document.getElementById('tourStatus');
+    document.querySelectorAll('.tour-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        document.querySelectorAll('.tour-tab').forEach(function (other) {
+          other.setAttribute('aria-selected', other === tab ? 'true' : 'false');
+        });
+        tourImage.src = tab.dataset.image;
+        tourImage.alt = tab.dataset.alt;
+        tourStatus.textContent = tab.dataset.status;
+      });
+    });
+
+    var time = document.getElementById('sessionTime');
+    var fuel = document.getElementById('sessionFuel');
+    var sessionImage = document.getElementById('sessionImage');
+    var demoStart = document.getElementById('demoStart');
+    document.querySelectorAll('.minute-chip').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        document.querySelectorAll('.minute-chip').forEach(function (other) {
+          other.setAttribute('aria-pressed', other === chip ? 'true' : 'false');
+        });
+        var total = Number(chip.dataset.minutes) * 60;
+        var hours = Math.floor(total / 3600);
+        var minutes = String(Math.floor(total / 60) % 60).padStart(2, '0');
+        time.textContent = hours ? hours + ':' + minutes + ':00' : Math.floor(total / 60) + ':00';
+        fuel.textContent = chip.dataset.fuel;
+      });
+    });
+    demoStart.addEventListener('click', function () {
+      var live = demoStart.dataset.live === 'true';
+      demoStart.dataset.live = live ? 'false' : 'true';
+      demoStart.textContent = live ? 'See the phone go down' : 'Return to the composer';
+      sessionImage.src = live ? 'app-down.webp' : 'app-session.webp';
+      sessionImage.alt = live ? 'The current Eclipse Phone down composer' : 'A live Eclipse phone-down session';
+    });
+
+    var hero = document.getElementById('heroVisual');
+    var phone = document.getElementById('heroPhone');
+    var moon = document.getElementById('heroMoon');
+    var canMove = window.matchMedia('(hover:hover) and (prefers-reduced-motion:no-preference)').matches;
+    if (canMove) {
+      hero.addEventListener('pointermove', function (event) {
+        var rect = hero.getBoundingClientRect();
+        var x = (event.clientX - rect.left) / rect.width - .5;
+        var y = (event.clientY - rect.top) / rect.height - .5;
+        phone.style.setProperty('--ry', (x * 5).toFixed(2) + 'deg');
+        phone.style.setProperty('--rx', (-y * 4).toFixed(2) + 'deg');
+        moon.style.setProperty('--mx', (-x * 16).toFixed(1) + 'px');
+        moon.style.setProperty('--my', (-y * 12).toFixed(1) + 'px');
+      });
+      hero.addEventListener('pointerleave', function () {
+        phone.style.removeProperty('--ry'); phone.style.removeProperty('--rx');
+        moon.style.removeProperty('--mx'); moon.style.removeProperty('--my');
+      });
     }
   })();
   </script>
