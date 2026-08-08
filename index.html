@@ -112,17 +112,11 @@
     .card p { margin-top: 0.5rem; color: var(--ink2); line-height: 1.6; font-size: 0.9375rem; }
     .pip { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 
-    /* ---------- product tour ---------- */
-    .tour { display: grid; gap: 2.25rem; margin-top: 2.5rem; align-items: center; }
-    .tour-copy { display: grid; gap: .75rem; }
-    .tour-tab, .minute-chip {
+    .minute-chip {
       appearance: none; width: 100%; color: var(--ink2); background: transparent;
       border: 1px solid var(--line); border-radius: 16px; padding: 1rem 1.1rem;
       font: inherit; text-align: left; cursor: pointer; transition: .2s ease;
     }
-    .tour-tab strong { display: block; color: var(--ink); font-size: 1.05rem; }
-    .tour-tab span { display: block; margin-top: .3rem; font-size: .9rem; line-height: 1.5; }
-    .tour-tab[aria-selected="true"] { border-color: rgba(73,215,162,.6); background: rgba(73,215,162,.07); transform: translateX(6px); }
     .product-phone { width: min(300px, 78vw); }
     .product-phone img { aspect-ratio: 402/874; object-fit: cover; }
 
@@ -144,15 +138,20 @@
        over the still body baked into the webp, so the phones read as
        alive without re-shooting every screen. Coordinates are fractions
        of the screen area, per screenshot. */
-    /* The patch is a rectangular crop, and its glow is a shade brighter
-       than the still underneath, so a hard edge would read as a box
-       around the body. Feather the outer rim: the sphere itself sits
-       well inside the opaque core, and the fade lands on background
-       that matches on both layers. */
+    /* The patch carries the composer's own GREEN glow around the sphere,
+       so anything of it that survives the mask paints a dark ring over
+       whatever the screenshot has there: invisible on the composer,
+       a hole punched in the blue glow of a live session. So the mask is
+       a circle cut exactly at the sphere's limb, and nothing but the
+       sphere is ever drawn. Everything around it is the screenshot's
+       own glow. The numbers below are measured, not guessed: the sphere
+       sits at 49.8% / 50.9% of the patch with a radius of 90% of the
+       closest side. */
     .rockspin {
       position: absolute; pointer-events: none; z-index: 3;
-      -webkit-mask-image: radial-gradient(closest-side, #000 86%, transparent 100%);
-      mask-image: radial-gradient(closest-side, #000 86%, transparent 100%);
+      aspect-ratio: 240 / 288;   /* the patch's own frame, so the box never waits on the video to size it */
+      -webkit-mask-image: radial-gradient(circle closest-side at 49.8% 50.9%, #000 86%, transparent 90%);
+      mask-image: radial-gradient(circle closest-side at 49.8% 50.9%, #000 86%, transparent 90%);
     }
     .rockspin video { width: 100%; height: 100%; display: block; }
 
@@ -184,14 +183,13 @@
       ul.doors li { grid-template-columns: 300px 1fr; gap: 1.5rem; align-items: baseline; }
       .doordesc { padding-left: 0; }
       .cards { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-      .tour { grid-template-columns: minmax(0, 1fr) minmax(280px, .8fr); }
       .session-lab { grid-template-columns: minmax(0, 1fr) minmax(280px, .85fr); }
       .privacy { padding: 3rem; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       .button { transition: none; }
-      .phone, .tour-tab { transition: none; }
+      .phone, .minute-chip { transition: none; }
       .rockspin { display: none !important; }
     }
   </style>
@@ -245,34 +243,6 @@
       <p class="kicker">This is the oldest trick in behaviour change, and it is the one that works. It is why people run with a friend instead of alone, and why the gym buddy who is waiting outside beats every alarm you have ever set.</p>
     </section>
 
-    <section id="inside">
-      <p class="mono">Inside Eclipse</p>
-      <h2>One promise. Three places to keep it.</h2>
-      <p class="lede">These are current screens from the app, not illustrations. Move through them to see what Eclipse keeps close and what it deliberately leaves out.</p>
-      <div class="tour">
-        <div class="tour-copy" role="tablist" aria-label="Explore Eclipse screens">
-          <button class="tour-tab" role="tab" aria-selected="true" data-image="app-home.webp" data-alt="Eclipse Home with an equipped asteroid and today's limit">
-            <strong>Home</strong><span>A quick summary of your day and remaining limit.</span>
-          </button>
-          <button class="tour-tab" role="tab" aria-selected="false" data-image="app-wall.webp" data-alt="The Eclipse Wall showing a raised limit, an open ask for more time, and time a friend gave">
-            <strong>The wall</strong><span>Someone raised their limit. Someone is asking for more time. Someone was given it. The circle sees what happened.</span>
-          </button>
-          <button class="tour-tab" role="tab" aria-selected="false" data-image="app-stats.webp" data-alt="Eclipse Stats showing time given back and the week">
-            <strong>Stats</strong><span>See the days you kept, time given back and phone-down sessions.</span>
-          </button>
-        </div>
-        <div>
-          <div class="phone product-phone"><div class="screen">
-            <img id="tourImage" src="app-home.webp" width="804" height="1748" loading="lazy" alt="Eclipse Home with the equipped Moon and today's limit">
-            <video class="rockspin" id="tourSpin" style="left:25.6%;top:13.7%;width:50%" autoplay muted loop playsinline aria-hidden="true">
-              <source src="spin-moon.webm" type="video/webm">
-              <source src="spin-moon.mp4" type="video/mp4">
-            </video>
-          </div></div>
-        </div>
-      </div>
-    </section>
-
     <section>
       <p class="mono">When time is up</p>
       <h2>A wall, and one human door.</h2>
@@ -280,14 +250,14 @@
       <ul class="doors">
         <li>
           <div class="doorname"><span class="dot" style="background: var(--honey)"></span>Two minutes, right now</div>
-          <p class="doordesc">For the message that genuinely cannot wait. Two minutes open instantly in the app you tapped from, nothing to watch. Once every half hour, at most three times a day.</p>
+          <p class="doordesc">For the message that genuinely cannot wait. Two minutes open instantly in the app you tapped from. Once every half hour, at most three times a day.</p>
         </li>
         <li>
           <div class="doorname"><span class="dot" style="background: var(--frost)"></span>Ask a friend</div>
           <p class="doordesc">The real emergency door. Ask for fifteen minutes, an hour, or the rest of the day, and say why.</p>
         </li>
       </ul>
-      <p class="kicker">Raising your limit is always possible, because this is your phone. It just costs your streak. Tightening is free. Loosening is not.</p>
+      <p class="kicker">Raising your limit is always possible. It just costs your streak. Tightening is free. Loosening is not.</p>
       <p class="kicker">Two things make that a real decision rather than a reflex. <strong>Your lifeline will see your increase</strong>, and <strong>a new limit applies from the next 6am, never today.</strong> Today keeps the promise you made yesterday.</p>
     </section>
 
@@ -319,11 +289,11 @@
         <div class="session-phone-wrap">
           <div class="phone product-phone"><div class="screen">
             <img id="sessionImage" src="app-down.webp" width="804" height="1748" loading="lazy" alt="The current Eclipse Phone down composer">
-            <video class="rockspin" id="downSpin" style="left:26.2%;top:12.65%;width:50%" autoplay muted loop playsinline aria-hidden="true">
+            <video class="rockspin" id="downSpin" style="left:29.86%;top:16.56%;width:40.45%" autoplay muted loop playsinline aria-hidden="true">
               <source src="spin-moon.webm" type="video/webm">
               <source src="spin-moon.mp4" type="video/mp4">
             </video>
-            <video class="rockspin" id="liveSpin" style="left:26.4%;top:35.4%;width:50%;display:none" muted loop playsinline aria-hidden="true">
+            <video class="rockspin" id="liveSpin" style="left:29.86%;top:38.52%;width:40.45%;display:none" muted loop playsinline aria-hidden="true">
               <source src="spin-moon.webm" type="video/webm">
               <source src="spin-moon.mp4" type="video/mp4">
             </video>
@@ -376,19 +346,6 @@
     /* Muted inline video may still sit paused after a bfcache restore. */
     document.querySelectorAll('video.rockspin[autoplay]').forEach(function (v) {
       var p = v.play(); if (p && p.catch) p.catch(function () {});
-    });
-
-    var tourImage = document.getElementById('tourImage');
-    var tourSpin = document.getElementById('tourSpin');
-    document.querySelectorAll('.tour-tab').forEach(function (tab) {
-      tab.addEventListener('click', function () {
-        document.querySelectorAll('.tour-tab').forEach(function (other) {
-          other.setAttribute('aria-selected', other === tab ? 'true' : 'false');
-        });
-        tourImage.src = tab.dataset.image;
-        tourImage.alt = tab.dataset.alt;
-        syncSpin(tourSpin, tab.dataset.image === 'app-home.webp');
-      });
     });
 
     var time = document.getElementById('sessionTime');
