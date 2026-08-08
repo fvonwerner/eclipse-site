@@ -148,7 +148,6 @@
     .tour-tab[aria-selected="true"] { border-color: rgba(73,215,162,.6); background: rgba(73,215,162,.07); transform: translateX(6px); }
     .product-phone { width: min(300px, 78vw); }
     .product-phone img { aspect-ratio: 402/874; object-fit: cover; }
-    .tour-status { min-height: 1.5em; color: var(--sagelight); }
 
     /* ---------- phone-down lab ---------- */
     .session-lab { display: grid; gap: 2.5rem; margin-top: 2.5rem; align-items: center; }
@@ -159,15 +158,17 @@
     .minute-chip[aria-pressed="true"] { color: #04120C; background: var(--sage); border-color: var(--sage); font-weight: 800; }
     .session-readout { margin-top: 1.6rem; padding-top: 1.35rem; border-top: 1px solid var(--line); }
     .session-time { font-size: clamp(2.5rem, 8vw, 4.4rem); line-height: 1; font-weight: 850; letter-spacing: -.045em; }
-    .fuel-line { margin-top: .75rem; color: var(--honey); }
     .demo-start { width: 100%; margin-top: 1.4rem; border: 1px solid rgba(73,215,162,.6); border-radius: 14px;
       padding: .9rem 1rem; color: var(--sagelight); background: rgba(73,215,162,.08); font: inherit; font-weight: 800; cursor: pointer; }
-    .session-note { margin-top: 1rem; color: var(--ink3); font-size: .82rem; line-height: 1.6; }
     .session-phone-wrap { position: relative; display: grid; place-items: center; }
-    .session-orbit { position: absolute; width: min(410px, 94vw); aspect-ratio: 1; border: 1px solid rgba(99,205,230,.14); border-radius: 50%;
-      animation: orbit 18s linear infinite; }
-    .session-orbit::after { content:""; position:absolute; width:8px; height:8px; border-radius:50%; background:var(--frost); left:12%; top:12%; box-shadow:0 0 24px var(--frost); }
-    @keyframes orbit { to { transform: rotate(1turn); } }
+
+    /* A live spinning body over each screenshot that carries one. The
+       canvas ray traces the same sphere as the hero moon and sits exactly
+       over the still body baked into the webp, so the phones read as
+       alive without re-shooting every screen. Coordinates are fractions
+       of the screen area, per screenshot. */
+    .rockspin { position: absolute; pointer-events: none; z-index: 3; }
+    .rockspin canvas, .rockspin img { width: 100%; height: 100%; display: block; }
 
 
     .privacy { border-radius: 24px; background: var(--bg2); border: 1px solid var(--line);
@@ -205,7 +206,7 @@
       html { scroll-behavior: auto; }
       .button { transition: none; }
       .phone, .moonlive, .tour-tab { transition: none; }
-      .session-orbit { animation: none; }
+      .rockspin { display: none !important; }
     }
   </style>
 </head>
@@ -238,6 +239,10 @@
           <div class="screen">
             <img src="app-home.webp" width="804" height="1748" loading="eager"
                  alt="The current Eclipse Home screen with a newly unlocked asteroid, today's screen-time limit, phone-down minutes, pickups and the week at a glance">
+            <video class="rockspin" style="left:31.5%;top:19.1%;width:38.2%" autoplay muted loop playsinline aria-hidden="true">
+              <source src="spin-home.webm" type="video/webm">
+              <source src="spin-home.mp4" type="video/mp4">
+            </video>
           </div>
         </div>
       </div>
@@ -253,29 +258,34 @@
       <p class="mono">Why a friend</p>
       <h2>Willpower is the thing that already failed.</h2>
       <p class="lede">Every screen time app asks the same person who opened Instagram to also be the person who stops. That is you against yourself at your worst moment, and the average person has been losing that argument for years. It is not a character flaw. These apps are built by thousands of people whose whole job is to keep you scrolling.</p>
-      <p class="kicker">So Eclipse changes who is in the room. Your limit, your streak and your kept days are visible to a handful of friends you chose. Not a feed, not followers, not strangers: three or four people who will notice. Breaking a promise is easy when nobody is watching and surprisingly hard when someone is.</p>
+      <p class="kicker">So Eclipse changes who is in the room. Your limit, your streak and your kept days are visible to a handful of friends you chose. You see which limits your friends have set for themselves, and they see yours. Not a feed, not followers, not strangers: three or four people who will notice. Breaking a promise is easy when nobody is watching and surprisingly hard when someone is.</p>
       <p class="kicker">This is the oldest trick in behaviour change, and it is the one that works. It is why people run with a friend instead of alone, and why the gym buddy who is waiting outside beats every alarm you have ever set.</p>
     </section>
 
     <section id="inside">
       <p class="mono">Inside Eclipse</p>
       <h2>One promise. Three places to keep it.</h2>
-      <p class="lede">These are current screens from the app—not illustrations. Move through them to see what Eclipse keeps close and what it deliberately leaves out.</p>
+      <p class="lede">These are current screens from the app, not illustrations. Move through them to see what Eclipse keeps close and what it deliberately leaves out.</p>
       <div class="tour">
         <div class="tour-copy" role="tablist" aria-label="Explore Eclipse screens">
-          <button class="tour-tab" role="tab" aria-selected="true" data-image="app-home.webp" data-alt="Eclipse Home with an equipped asteroid and today's limit" data-status="Home keeps today legible in one glance.">
-            <strong>Home</strong><span>Your limit, kept days, time down, pickups and one body earned away from the phone.</span>
+          <button class="tour-tab" role="tab" aria-selected="true" data-image="app-home.webp" data-alt="Eclipse Home with an equipped asteroid and today's limit">
+            <strong>Home</strong><span>A quick summary of your day and remaining limit.</span>
           </button>
-          <button class="tour-tab" role="tab" aria-selected="false" data-image="app-wall.webp" data-alt="The Eclipse Wall where time requests appear" data-status="The wall is small, private and useful.">
-            <strong>The wall</strong><span>Requests go to your lifeline first. After five minutes they can reach the circle; one yes ends the ask.</span>
+          <button class="tour-tab" role="tab" aria-selected="false" data-image="app-wall.webp" data-alt="The Eclipse Wall showing a raised limit, an open ask for more time, and time a friend gave">
+            <strong>The wall</strong><span>Someone raised their limit. Someone is asking for more time. Someone was given it. The circle sees what happened.</span>
           </button>
-          <button class="tour-tab" role="tab" aria-selected="false" data-image="app-stats.webp" data-alt="Eclipse Stats showing time given back and the week" data-status="Progress counts what came back to you.">
-            <strong>Stats</strong><span>See the days you kept, time given back and phone-down sessions—without turning restraint into another feed.</span>
+          <button class="tour-tab" role="tab" aria-selected="false" data-image="app-stats.webp" data-alt="Eclipse Stats showing time given back and the week">
+            <strong>Stats</strong><span>See the days you kept, time given back and phone-down sessions.</span>
           </button>
         </div>
         <div>
-          <div class="phone product-phone"><div class="screen"><img id="tourImage" src="app-home.webp" width="804" height="1748" loading="lazy" alt="Eclipse Home with an equipped asteroid and today's limit"></div></div>
-          <p class="mono tour-status" id="tourStatus" aria-live="polite">Home keeps today legible in one glance.</p>
+          <div class="phone product-phone"><div class="screen">
+            <img id="tourImage" src="app-home.webp" width="804" height="1748" loading="lazy" alt="Eclipse Home with an equipped asteroid and today's limit">
+            <video class="rockspin" id="tourSpin" style="left:31.5%;top:19.1%;width:38.2%" autoplay muted loop playsinline aria-hidden="true">
+              <source src="spin-home.webm" type="video/webm">
+              <source src="spin-home.mp4" type="video/mp4">
+            </video>
+          </div></div>
         </div>
       </div>
     </section>
@@ -287,11 +297,11 @@
       <ul class="doors">
         <li>
           <div class="doorname"><span class="dot" style="background: var(--honey)"></span>Two minutes, right now</div>
-          <p class="doordesc">For the message that genuinely cannot wait. A ten-second boost opens two minutes in the app you tapped from. Three a day, then you are done.</p>
+          <p class="doordesc">For the message that genuinely cannot wait. Two minutes open instantly in the app you tapped from, nothing to watch. Once every half hour, at most three times a day.</p>
         </li>
         <li>
           <div class="doorname"><span class="dot" style="background: var(--frost)"></span>Ask a friend</div>
-          <p class="doordesc">The real emergency door. Ask your lifeline for fifteen minutes, an hour, or the rest of the day, and say why. They get the first five minutes; after that you can ask the rest of your circle. One yes settles it.</p>
+          <p class="doordesc">The real emergency door. Ask for fifteen minutes, an hour, or the rest of the day, and say why.</p>
         </li>
       </ul>
       <p class="kicker">Raising your limit is always possible, because this is your phone. It just costs your streak. Tightening is free. Loosening is not.</p>
@@ -308,7 +318,7 @@
     <section id="phone-down">
       <p class="mono">Phone down</p>
       <h2>Put it down, and let something remain.</h2>
-      <p class="lede">A session shields the whole phone. Finish it and you earn fuel for expeditions: asteroids, moons, stars and galaxies that live on Home. Stop early and it pays nothing. Try the pacing below.</p>
+      <p class="lede">A session shields the whole phone: every app and every notification is blocked until the timer runs out. Finish it and you earn fuel for expeditions: asteroids, moons, stars and galaxies that live on Home. Stop early and it pays nothing. Try the pacing below.</p>
       <div class="session-lab">
         <div class="session-panel">
           <p class="mono">Plan a session</p>
@@ -320,29 +330,23 @@
           </div>
           <div class="session-readout">
             <div class="session-time" id="sessionTime">1:00:00</div>
-            <p class="fuel-line"><span id="sessionFuel">6</span> fuel on finish · example ×1.4 body</p>
           </div>
           <button class="demo-start" id="demoStart">See the phone go down</button>
-          <p class="session-note">Payouts rise at every 15-minute step. Friends who are still down with you add 10% each, up to 40%. Every new install starts with one free asteroid packet, already equipped, so Home is never empty.</p>
         </div>
         <div class="session-phone-wrap">
-          <div class="session-orbit" aria-hidden="true"></div>
-          <div class="phone product-phone"><div class="screen"><img id="sessionImage" src="app-down.webp" width="804" height="1748" loading="lazy" alt="The current Eclipse Phone down composer"></div></div>
+          <div class="phone product-phone"><div class="screen">
+            <img id="sessionImage" src="app-down.webp" width="804" height="1748" loading="lazy" alt="The current Eclipse Phone down composer">
+            <video class="rockspin" id="downSpin" style="left:29.9%;top:20.6%;width:39.0%" autoplay muted loop playsinline aria-hidden="true">
+              <source src="spin-down.webm" type="video/webm">
+              <source src="spin-down.mp4" type="video/mp4">
+            </video>
+            <video class="rockspin" id="liveSpin" style="left:31.5%;top:42.7%;width:38.2%;display:none" muted loop playsinline aria-hidden="true">
+              <source src="spin-session.webm" type="video/webm">
+              <source src="spin-session.mp4" type="video/mp4">
+            </video>
+          </div></div>
         </div>
       </div>
-      <div class="cards">
-        <div class="card"><h3><span class="pip" style="background: var(--sage)"></span>The whole phone rests</h3><p>The lock holds for the session you chose. The live screen is modal, so a stray swipe cannot take you elsewhere while the session runs.</p></div>
-        <div class="card"><h3><span class="pip" style="background: var(--dusk)"></span>A board that counts the right thing</h3><p>It ranks the minutes you chose to be unreachable, never the hours you lost. Nobody wins by having a worse week.</p></div>
-        <div class="card"><h3><span class="pip" style="background: var(--honey)"></span>No duplicate expeditions</h3><p>An expedition only repeats a body after you have charted every body in that tier. What you carry is a record of time you actually took back.</p></div>
-      </div>
-    </section>
-
-    <section>
-      <p class="mono">The price</p>
-      <h2>All of it, free.</h2>
-      <p class="lede">Screen time apps have quietly become expensive. The popular ones run between thirty and a hundred dollars a year, and one of them asks $399 for a lifetime licence. Their free tiers are usually built to be just annoying enough that you pay.</p>
-      <p class="kicker">There is no paid tier, no locked feature and no trial that expires. The limit, the friend circle, the emergency door, the sessions, all of it is simply the app.</p>
-      <p class="kicker">The reason is not generosity, it is arithmetic. The people this problem hurts most are the ones least able to pay to fix it. A fifteen year old losing five hours a day is not going to talk a parent into a hundred dollar subscription. Charging would mean building something that doesn't reach the people who are most vulnerable.</p>
     </section>
 
     <div class="privacy">
@@ -541,8 +545,22 @@
   /* Small, optional moments of agency. They explain the product and never
      block reading; everything still works as a static page without JS. */
   (function () {
+    /* The live rock: each screenshot that carries the body gets a small
+       looping video patch cropped from the same simulator scene, so the
+       stone actually turns. Videos hide with the screen they belong to. */
+    function syncSpin(video, on) {
+      if (!video) return;
+      video.style.display = on ? '' : 'none';
+      if (on) { var p = video.play(); if (p && p.catch) p.catch(function () {}); }
+      else video.pause();
+    }
+    /* Muted inline video may still sit paused after a bfcache restore. */
+    document.querySelectorAll('video.rockspin[autoplay]').forEach(function (v) {
+      var p = v.play(); if (p && p.catch) p.catch(function () {});
+    });
+
     var tourImage = document.getElementById('tourImage');
-    var tourStatus = document.getElementById('tourStatus');
+    var tourSpin = document.getElementById('tourSpin');
     document.querySelectorAll('.tour-tab').forEach(function (tab) {
       tab.addEventListener('click', function () {
         document.querySelectorAll('.tour-tab').forEach(function (other) {
@@ -550,14 +568,15 @@
         });
         tourImage.src = tab.dataset.image;
         tourImage.alt = tab.dataset.alt;
-        tourStatus.textContent = tab.dataset.status;
+        syncSpin(tourSpin, tab.dataset.image === 'app-home.webp');
       });
     });
 
     var time = document.getElementById('sessionTime');
-    var fuel = document.getElementById('sessionFuel');
     var sessionImage = document.getElementById('sessionImage');
     var demoStart = document.getElementById('demoStart');
+    var downSpin = document.getElementById('downSpin');
+    var liveSpin = document.getElementById('liveSpin');
     document.querySelectorAll('.minute-chip').forEach(function (chip) {
       chip.addEventListener('click', function () {
         document.querySelectorAll('.minute-chip').forEach(function (other) {
@@ -567,7 +586,6 @@
         var hours = Math.floor(total / 3600);
         var minutes = String(Math.floor(total / 60) % 60).padStart(2, '0');
         time.textContent = hours ? hours + ':' + minutes + ':00' : Math.floor(total / 60) + ':00';
-        fuel.textContent = chip.dataset.fuel;
       });
     });
     demoStart.addEventListener('click', function () {
@@ -576,6 +594,8 @@
       demoStart.textContent = live ? 'See the phone go down' : 'Return to the composer';
       sessionImage.src = live ? 'app-down.webp' : 'app-session.webp';
       sessionImage.alt = live ? 'The current Eclipse Phone down composer' : 'A live Eclipse phone-down session';
+      syncSpin(downSpin, live);
+      syncSpin(liveSpin, !live);
     });
 
     var hero = document.getElementById('heroVisual');
